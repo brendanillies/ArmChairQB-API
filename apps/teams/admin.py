@@ -22,19 +22,18 @@ class TeamsAdmin(admin.ModelAdmin):
     def upload_csv(self, request):
         # TODO: If records exist, bulk_update
         if request.method == "POST":
-            print(request.POST.get("teams"))
            
             csv_file = request.FILES["csv_file"]
 
             df = pd.read_csv(csv_file)
-            # teams = (
-            #     Teams(**record) for record in df.to_dict('records')
-            # )
-            # Teams.objects.bulk_create(teams)
+            teams = (
+                Teams(**record) for record in df.to_dict('records')
+            )
+            Teams.objects.bulk_create(teams)
 
             self.message_user(request, "Your csv file has been imported")
 
         form = ImportCSVForm()
         data = {"form": form}
 
-        return render(request, "admin/import-csv.html", data)
+        return render(request, "admin/teams/import-csv.html", data)
