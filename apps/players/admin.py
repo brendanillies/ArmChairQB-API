@@ -1,31 +1,102 @@
 from django.contrib import admin
-from django.forms import Form, FileField
+from django.forms import Form, CharField, FileField
 from django.urls import path
 from django.shortcuts import render
 import pandas as pd
-from .models import Player, PlayerIdentifier, Roster, DepthChart
+from .models import PlayerIdentifier, Roster, DepthChart, Player
 
 
-class ImportCSVForm(Form):
-    csv_file = FileField()
-
-
-admin.site.register(PlayerIdentifier)
-admin.site.register(Roster)
-admin.site.register(DepthChart)
 admin.site.register(Player)
 
 
-class PlayerIdentifierAdmin(admin.ModelAdmin):
+class ImportCSVRosterForm(Form):
+    upload_roster_file = FileField()
+
+
+class ImportCSVPlayerIdentifierForm(Form):
+    upload_player_identifier_file = FileField()
+
+
+class ImportCSVDepthChartForm(Form):
+    upload_depth_chart_file = FileField()
+
+
+@admin.register(PlayerIdentifier, Roster, DepthChart)
+class PlayersAdmin(admin.ModelAdmin):
     change_list_template = "admin/players/change_list.html"
 
+    @staticmethod
+    def __create_player_identifier_objects(file):
+        df = pd.read_csv(
+            file,
+            usecols=["gsis_id", "espn_id", "yahoo_id", "name", "db_season"],
+            dtype={
+                "espn_id": pd.Int32Dtype(),
+                "yahoo_id": pd.Int32Dtype(),
+                "db_season": pd.Int16Dtype(),
+            },
+        )
+        ids = (
+            PlayerIdentifier(**record)
+            for record in df[(df.index < 5) & ~pd.isna(df["gsis_id"])].to_dict(
+                "records"
+            )
+        )
+        # PlayerIdentifier.objects.bulk_create(ids, batch_size=1000)
+        return
 
-class RosterAdmin(admin.ModelAdmin):
-    change_list_template = "admin/players/change_list.html"
+    @staticmethod
+    def __create_depth_chart_objects(file):
+        df = pd.read_csv(
+            file,
+            usecols=[
+                "season",
+                "club_code",
+                "week",
+                "game_type",
+                "depth_team",
+                "formation",
+                "gsis_id",
+                "jersey_number",
+                "position",
+                "depth_position",
+                "full_name",
+            ],
+        ).rename(columns={"club_code": "club_code_id"})
 
+        ids = ["00-0039163", "00-0039152", "00-0039150", "00-0038550", "00-0038400"]
+        objs = (
+            DepthChart(**record)
+            for record in df[df["gsis_id"].isin(ids)].to_dict("records")
+        )
 
-class DepthChartAdmin(admin.ModelAdmin):
-    change_list_template = "admin/players/change_list.html"
+        # DepthChart.objects.bulk_create(objs, batch_size=1000)
+
+        return
+
+    @staticmethod
+    def __create_roster_objects(file):
+        df = pd.read_csv(file, usecols=[
+            "season",
+            "team",
+            "position",
+            "status", 
+            "player_name",
+            "week",
+            "game_type",
+            "college",
+            "player_id"
+        ]).rename(columns={"team": "team_id"})
+
+        ids = ["00-0039163", "00-0039152", "00-0039150", "00-0038550", "00-0038400"]
+        objs = (
+            Roster(**record)
+            for record in df[df["player_id"].isin(ids)].to_dict("records")
+        )
+
+        # Roster.objects.bulk_create(objs, batch_size=1000)
+
+        return
 
     def get_urls(self):
         urls = super().get_urls()
@@ -35,80 +106,23 @@ class DepthChartAdmin(admin.ModelAdmin):
     def upload_csv(self, request):
         # TODO: If records exist, bulk_update
         if request.method == "POST":
-            print(request)
-            csv_file = request.FILES["csv_file"]
-            self.message_user(request, "CSV file has been captured")
+            upload_player_identifier_file = request.FILES[
+                "upload_player_identifier_file"
+            ]
+            self.__create_player_identifier_objects(upload_player_identifier_file)
 
-            df = pd.read_csv(csv_file)
-            # teams = (
-            #     Teams(**record) for record in df.to_dict('records')
-            # )
-            # Teams.objects.bulk_create(teams)
+            upload_depth_chart_file = request.FILES["upload_depth_chart_file"]
+            self.__create_depth_chart_objects(upload_depth_chart_file)
+            
+            upload_roster_file = request.FILES["upload_roster_file"]
+            self.__create_roster_objects(upload_roster_file)
 
-            # self.message_user(request, "Your csv file has been imported")
+            self.message_user(request, "Your files has been imported")
 
-        form = ImportCSVForm()
-        data = {"form": form}
+        data = {
+            "rosterForm": ImportCSVRosterForm(),
+            "identifierForm": ImportCSVPlayerIdentifierForm(),
+            "depthChartForm": ImportCSVDepthChartForm(),
+        }
 
-        return render(request, "admin/import-csv.html", data)
-
-
-# @admin.register(Players)
-# class PlayersAdmin(admin.ModelAdmin):
-#     change_list_template = "admin/change_list.html"
-
-#     def get_urls(self):
-#         urls = super().get_urls()
-#         new_urls = [path("import-csv/", self.upload_csv)]
-#         return new_urls + urls
-
-#     def upload_csv(self, request):
-#         # TODO: If records exist, bulk_update
-#         if request.method == "POST":
-#             csv_file = request.FILES["csv_file"]
-
-#             df = pd.read_csv(csv_file, dtype={"current_team_id": pd.Int16Dtype()})
-#             df.drop(df[
-#                 pd.isna(df["current_team_id"]) or df["status"].isin(["CUT", "RET", "", "E14", "E01"])
-#                 ].index, inplace=True)
-#             df.rename(columns={"current_team_id": "current_team_id_id"}, inplace=True)
-
-#             players = list()
-#             for idx, row in df.iterrows():
-#                 row.drop(labels=row[row.isnull()].keys(), inplace=True)
-#                 players.append(Players(**row.to_dict()))
-
-#             Players.objects.bulk_create(players)
-
-#             self.message_user(request, "Your csv file has been imported")
-
-#         form = ImportCSVForm()
-#         data = {"form": form}
-
-#         return render(request, "admin/import-csv.html", data)
-
-
-# @admin.register(PlayerIDs)
-# class PlayerIDsAdmin(admin.ModelAdmin):
-#     change_list_template = "admin/change_list.html"
-
-#     def get_urls(self):
-#         urls = super().get_urls()
-#         new_urls = [path("import-csv/", self.upload_csv)]
-#         return new_urls + urls
-
-#     def upload_csv(self, request):
-#         # TODO: If records exist, bulk_update
-#         if request.method == "POST":
-#             csv_file = request.FILES["csv_file"]
-
-#             df = pd.read_csv(csv_file)
-#             player_ids = (PlayerIDs(**record) for record in df.to_dict("records"))
-#             PlayerIDs.objects.bulk_create(player_ids)
-
-#             self.message_user(request, "Your csv file has been imported")
-
-#         form = ImportCSVForm()
-#         data = {"form": form}
-
-#         return render(request, "admin/import-csv.html", data)
+        return render(request, "admin/players/import-csv.html", data)

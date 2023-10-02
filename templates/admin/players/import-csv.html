@@ -1,0 +1,17 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    <div>
+        <h2>Upload Rosters, Player Identifiers, and Depth Charts</h2>
+        <form action="." method="POST" enctype="multipart/form-data">
+            {{ rosterForm.as_p }}
+            {{ identifierForm.as_p }}
+            {{ depthChartForm.as_p }}
+            {% csrf_token %}
+
+            <button type="submit" id="teamsSubmission" name="teams">Submit</button>
+        </form>
+    </div>
+
+
+{% endblock %}
