@@ -19,8 +19,8 @@ class PlayerIdentifier(models.Model):
 
     gsis_id = CharField(max_length=12, primary_key=True, db_column="player_id")
 
-    espn_id = IntegerField(unique=True, null=True)
-    yahoo_id = IntegerField(unique=True, null=True)
+    espn_id = IntegerField(null=True)
+    yahoo_id = IntegerField(null=True)
     name = CharField(max_length=50)
     db_season = IntegerField(null=True)
 
