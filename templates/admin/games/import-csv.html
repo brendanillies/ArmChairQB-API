@@ -1,0 +1,16 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    <div>
+        <h2>Upload Schedule and Play-By-Play Data</h2>
+        <form action="." method="POST" enctype="multipart/form-data">
+            {% comment %} {{ playByPlayForm.as_p }} {% endcomment %}
+            {{ scheduleForm.as_p }}
+            {% csrf_token %}
+
+            <button type="submit" id="gamesSubmission" name="games">Submit</button>
+        </form>
+    </div>
+
+
+{% endblock %}
