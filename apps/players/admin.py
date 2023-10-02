@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.forms import Form, CharField, FileField
+from django.forms import Form, FileField
 from django.urls import path
 from django.shortcuts import render
 import pandas as pd
@@ -117,7 +117,7 @@ class PlayersAdmin(admin.ModelAdmin):
             upload_roster_file = request.FILES["upload_roster_file"]
             self.__create_roster_objects(upload_roster_file)
 
-            self.message_user(request, "Your files has been imported")
+            self.message_user(request, "Your files have been imported")
 
         data = {
             "rosterForm": ImportCSVRosterForm(),
