@@ -36,13 +36,16 @@ class PlayersAdmin(admin.ModelAdmin):
                 "db_season": pd.Int16Dtype(),
             },
         )
+
+        # Drop duplicates that don't have an `espn_id` or `yahoo_id`
+        df = df[
+            ~pd.isna(df["gsis_id"]) & (~pd.isna(df["espn_id"]) | ~pd.isna(df["yahoo_id"]))
+        ]
         ids = (
             PlayerIdentifier(**record)
-            for record in df[(df.index < 5) & ~pd.isna(df["gsis_id"])].to_dict(
-                "records"
-            )
+            for record in df.to_dict("records")
         )
-        # PlayerIdentifier.objects.bulk_create(ids, batch_size=1000)
+        PlayerIdentifier.objects.bulk_create(ids, batch_size=1000)
         return
 
     @staticmethod
@@ -63,39 +66,28 @@ class PlayersAdmin(admin.ModelAdmin):
                 "full_name",
             ],
         ).rename(columns={"club_code": "club_code_id"})
-
-        ids = ["00-0039163", "00-0039152", "00-0039150", "00-0038550", "00-0038400"]
-        objs = (
-            DepthChart(**record)
-            for record in df[df["gsis_id"].isin(ids)].to_dict("records")
-        )
-
-        # DepthChart.objects.bulk_create(objs, batch_size=1000)
-
+        objs = (DepthChart(**record) for record in df.to_dict("records"))
+        DepthChart.objects.bulk_create(objs, batch_size=1000)
         return
 
     @staticmethod
     def __create_roster_objects(file):
-        df = pd.read_csv(file, usecols=[
-            "season",
-            "team",
-            "position",
-            "status", 
-            "player_name",
-            "week",
-            "game_type",
-            "college",
-            "player_id"
-        ]).rename(columns={"team": "team_id"})
-
-        ids = ["00-0039163", "00-0039152", "00-0039150", "00-0038550", "00-0038400"]
-        objs = (
-            Roster(**record)
-            for record in df[df["player_id"].isin(ids)].to_dict("records")
-        )
-
-        # Roster.objects.bulk_create(objs, batch_size=1000)
-
+        df = pd.read_csv(
+            file,
+            usecols=[
+                "season",
+                "team",
+                "position",
+                "status",
+                "player_name",
+                "week",
+                "game_type",
+                "college",
+                "player_id",
+            ],
+        ).rename(columns={"team": "team_id"})
+        objs = (Roster(**record) for record in df.to_dict("records"))
+        Roster.objects.bulk_create(objs, batch_size=1000)
         return
 
     def get_urls(self):
@@ -113,7 +105,7 @@ class PlayersAdmin(admin.ModelAdmin):
 
             upload_depth_chart_file = request.FILES["upload_depth_chart_file"]
             self.__create_depth_chart_objects(upload_depth_chart_file)
-            
+
             upload_roster_file = request.FILES["upload_roster_file"]
             self.__create_roster_objects(upload_roster_file)
 
