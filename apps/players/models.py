@@ -60,8 +60,8 @@ class Roster(models.Model):
     game_type = CharField(max_length=5)
     college = CharField(max_length=30)
 
-    player = ForeignKey(
-        PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster"
+    gsis_id = ForeignKey(
+        PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster", name="gsis"
     )
 
     def __str__(self) -> str:
