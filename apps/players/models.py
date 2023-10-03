@@ -6,8 +6,7 @@ from django.db.models import (
     RESTRICT,
     ForeignKey,
     OneToOneField,
-    FloatField,
-    ManyToManyField
+    FloatField
 )
 import pandas as pd
 
@@ -39,9 +38,7 @@ class Player(models.Model):
         verbose_name_plural = "Players"
         db_table = "Players"
 
-    player = OneToOneField(
-        PlayerIdentifier, on_delete=RESTRICT, related_name="player"
-    )
+    player = OneToOneField(PlayerIdentifier, on_delete=RESTRICT, related_name="player")
     headshot_url = CharField(max_length=255)
     age = FloatField()
 
@@ -66,7 +63,7 @@ class Roster(models.Model):
     player = ForeignKey(
         PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster"
     )
-    
+
     def __str__(self) -> str:
         return f"{self.player_name} - Season {self.season}, Position {self.position}, Week {self.week}"
 
@@ -77,8 +74,14 @@ class DepthChart(models.Model):
         db_table = "DepthCharts"
 
     season = IntegerField()
-    club_code = ForeignKey("teams.Teams", on_delete=RESTRICT, related_name="team_depth", db_column="team", verbose_name="team")
-    week = ManyToManyField(Roster)
+    club_code = ForeignKey(
+        "teams.Teams",
+        on_delete=RESTRICT,
+        related_name="team_depth",
+        db_column="team",
+        verbose_name="team",
+    )
+    week = IntegerField()
     game_type = CharField(max_length=5)
     depth_team = IntegerField()
     formation = CharField(max_length=15)
