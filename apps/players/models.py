@@ -1,13 +1,5 @@
 from django.db import models
-from django.db.models import (
-    CharField,
-    IntegerField,
-    CASCADE,
-    RESTRICT,
-    ForeignKey,
-    OneToOneField,
-    FloatField
-)
+from django.db.models import CharField, IntegerField, RESTRICT, ForeignKey
 import pandas as pd
 
 
@@ -29,23 +21,6 @@ class PlayerIdentifier(models.Model):
                 YAHOO_ID: {self.yahoo_id})"""
 
 
-class Player(models.Model):
-    """
-    Player model populated using the PlayerIdentifier & Roster (for headshot) models
-    """
-
-    class Meta:
-        verbose_name_plural = "Players"
-        db_table = "Players"
-
-    player = OneToOneField(PlayerIdentifier, on_delete=RESTRICT, related_name="player")
-    headshot_url = CharField(max_length=255)
-    age = FloatField()
-
-    def __str__(self) -> str:
-        return f"{self.player.name}"
-
-
 class Roster(models.Model):
     class Meta:
         verbose_name_plural = "Rosters"
@@ -59,6 +34,7 @@ class Roster(models.Model):
     week = IntegerField()
     game_type = CharField(max_length=5)
     college = CharField(max_length=30)
+    headshot = CharField(max_length=255, default="")
 
     gsis_id = ForeignKey(
         PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster", name="gsis"

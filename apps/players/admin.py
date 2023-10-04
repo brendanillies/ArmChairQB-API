@@ -3,10 +3,7 @@ from django.forms import Form, FileField
 from django.urls import path
 from django.shortcuts import render
 import pandas as pd
-from .models import PlayerIdentifier, Roster, DepthChart, Player
-
-
-admin.site.register(Player)
+from .models import PlayerIdentifier, Roster, DepthChart
 
 
 class ImportCSVRosterForm(Form):
@@ -36,15 +33,17 @@ class PlayersAdmin(admin.ModelAdmin):
                 "db_season": pd.Int16Dtype(),
             },
         )
+        df = df[~pd.isna(df["gsis_id"])]
 
         # Drop duplicates that don't have an `espn_id` or `yahoo_id`
-        df = df[
-            ~pd.isna(df["gsis_id"]) & (~pd.isna(df["espn_id"]) | ~pd.isna(df["yahoo_id"]))
+        dup_df = df[df.duplicated(["gsis_id"], keep=False)]
+        dup_df = dup_df[
+            ~pd.isna(dup_df["gsis_id"])
+            & (~pd.isna(dup_df["espn_id"]) | ~pd.isna(dup_df["yahoo_id"]))
         ]
-        ids = (
-            PlayerIdentifier(**record)
-            for record in df.to_dict("records")
-        )
+        df.drop(index=dup_df.index, inplace=True)
+
+        ids = (PlayerIdentifier(**record) for record in df.to_dict("records"))
         PlayerIdentifier.objects.bulk_create(ids, batch_size=1000)
         return
 
@@ -66,7 +65,22 @@ class PlayersAdmin(admin.ModelAdmin):
                 "full_name",
             ],
         ).rename(columns={"club_code": "club_code_id"})
-        objs = (DepthChart(**record) for record in df.to_dict("records"))
+        df["club_code_id"].replace({"LA": "LAR"}, inplace=True)
+
+        objs = list()
+        for record in df.to_dict("records"):
+            PlayerIdentifier.objects.get_or_create(
+                gsis_id=record["gsis_id"],
+                defaults={
+                    "espn_id": None,
+                    "yahoo_id": None,
+                    "name": record["full_name"],
+                    "db_season": None,
+                },
+            )
+
+            objs.append(DepthChart(**record))
+
         DepthChart.objects.bulk_create(objs, batch_size=1000)
         return
 
@@ -84,9 +98,31 @@ class PlayersAdmin(admin.ModelAdmin):
                 "game_type",
                 "college",
                 "player_id",
+                "espn_id",
+                "yahoo_id",
             ],
-        ).rename(columns={"team": "team_id"})
-        objs = (Roster(**record) for record in df.to_dict("records"))
+        ).rename(columns={"team": "team_id", "player_id": "gsis_id"})
+        df["team_id"].replace({"LA": "LAR"}, inplace=True)
+
+        objs = list()
+        for record in df.to_dict("records"):
+            PlayerIdentifier.objects.get_or_create(
+                gsis_id=record["gsis_id"],
+                defaults={
+                    "espn_id": None
+                    if pd.isna(record["espn_id"])
+                    else record["espn_id"],
+                    "yahoo_id": None
+                    if pd.isna(record["yahoo_id"])
+                    else record["yahoo_id"],
+                    "name": record["player_name"],
+                    "db_season": None,
+                },
+            )
+
+            del record["espn_id"], record["yahoo_id"]
+            objs.append(Roster(**record))
+
         Roster.objects.bulk_create(objs, batch_size=1000)
         return
 
