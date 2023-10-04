@@ -54,7 +54,7 @@ class Schedule(models.Model):
     roof = CharField(max_length=8, default="")
 
     def __str__(self) -> str:
-        return f"Week {self.week} - {self.away_team} vs. {self.home_team}"
+        return f"{self.season} Week {self.week} - {self.away_team} vs. {self.home_team}"
 
 
 class PlayByPlay(models.Model):
