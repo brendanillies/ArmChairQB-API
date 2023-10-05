@@ -5,19 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("games", "0001_initial"),
-        ("games", "0002_rename_stadiums_stadium"),
-        ("games", "0003_rename_game_schedule_game_id"),
-        ("games", "0004_remove_stadium_roof_remove_stadium_surface_and_more"),
-        ("games", "0005_alter_stadium_stadium_id"),
-        ("games", "0006_rename_espn_schedule_espn_game_id"),
-        ("games", "0007_alter_schedule_overtime"),
-        ("games", "0008_alter_schedule_overtime"),
-        ("games", "0009_alter_schedule_overtime"),
-        ("games", "0010_alter_schedule_away_team_alter_schedule_home_team_and_more"),
-    ]
-
     initial = True
 
     dependencies = [

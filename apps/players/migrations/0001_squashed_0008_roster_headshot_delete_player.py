@@ -5,17 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("players", "0001_initial"),
-        ("players", "0002_rename_player_id_player_player_and_more"),
-        ("players", "0003_rename_gsis_id_depthchart_gsis_and_more"),
-        ("players", "0004_alter_playeridentifier_espn_id_and_more"),
-        ("players", "0005_remove_depthchart_elias_id"),
-        ("players", "0006_alter_playeridentifier_espn_id_and_more"),
-        ("players", "0007_rename_player_roster_gsis"),
-        ("players", "0008_roster_headshot_delete_player"),
-    ]
-
     initial = True
 
     dependencies = [
