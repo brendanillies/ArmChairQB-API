@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "corsheaders",
     "players",
     "games",
@@ -79,6 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ArmChairQB.wsgi.application"
 
+CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
