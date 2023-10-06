@@ -7,10 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = [
-        ("teams", "0001_initial"),
-    ]
-
     operations = [
         migrations.CreateModel(
             name="PlayByPlay",
