@@ -1,3 +1,24 @@
-from django.shortcuts import render
+from rest_framework import generics
 
-# Create your views here.
+from .models import PlayerIdentifier
+from .serializers import (
+    PlayerIdentifierSerializer,
+)
+
+
+class PlayerIdentifierList(generics.ListAPIView):
+    """
+    List all Player Identifier instances, or create a new Player Identifier instance
+    """
+
+    queryset = PlayerIdentifier.objects.all()
+    serializer_class = PlayerIdentifierSerializer
+
+
+class PlayerIdentifierDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a Player Identifier instance.
+    """
+
+    queryset = PlayerIdentifier.objects.all()
+    serializer_class = PlayerIdentifierSerializer
