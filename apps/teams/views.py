@@ -23,9 +23,10 @@ class TeamWeeklyRosterList(generics.ListAPIView):
     serializer_class = TeamRosterSerializer
 
     def get_queryset(self):
-        return Teams.objects.filter(team_abbr=self.kwargs["pk"])
+        return Teams.objects.filter(team_abbr=self.kwargs["team"])
 
     def get_serializer_context(self):
+        del self.kwargs["format"]
         context = {"request": self.kwargs}
         return context
 
@@ -39,9 +40,10 @@ class TeamWeeklyDepthChartList(generics.ListAPIView):
     serializer_class = TeamDepthChartSerializer
 
     def get_queryset(self):
-        return Teams.objects.filter(team_abbr=self.kwargs["pk"])
+        return Teams.objects.filter(team_abbr=self.kwargs["team"])
 
     def get_serializer_context(self):
+        del self.kwargs["format"]
         context = {"request": self.kwargs}
         return context
 
