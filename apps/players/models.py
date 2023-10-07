@@ -32,7 +32,6 @@ class Roster(models.Model):
     status = CharField(max_length=5)
     player_name = CharField(max_length=50)
     week = IntegerField()
-    game_type = CharField(max_length=5)
     college = CharField(max_length=30)
     headshot = CharField(max_length=255, default="")
 
@@ -59,7 +58,6 @@ class DepthChart(models.Model):
         name="team"
     )
     week = IntegerField()
-    game_type = CharField(max_length=5)
     depth_team = IntegerField()
     formation = CharField(max_length=15)
     gsis_id = ForeignKey(
