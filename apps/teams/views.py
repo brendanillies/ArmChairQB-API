@@ -1,8 +1,7 @@
 from rest_framework import generics
 
 from .models import Teams
-from .serializers import (TeamDepthChartSerializer, TeamRosterSerializer,
-                          TeamSerializer)
+from .serializers import TeamDepthChartSerializer, TeamRosterSerializer, TeamSerializer
 
 
 class TeamList(generics.ListCreateAPIView):
@@ -14,7 +13,22 @@ class TeamList(generics.ListCreateAPIView):
     serializer_class = TeamSerializer
 
 
-class TeamWeeklyRosterList(generics.ListAPIView):
+class TeamsAbstractInfoRetrieve(generics.RetrieveAPIView):
+    """
+    Abstract ListView of Teams-based objects
+    """
+
+    queryset = Teams.objects.all()
+    lookup_url_kwarg = "team"
+    lookup_field = "team_abbr"
+
+    def get_serializer_context(self):
+        del self.kwargs["format"]
+        context = {"request": self.kwargs}
+        return context
+
+
+class TeamWeeklyRosterList(TeamsAbstractInfoRetrieve):
     """
     This view returns a list of all Rostered players on a team
     filtered by week
@@ -22,30 +36,13 @@ class TeamWeeklyRosterList(generics.ListAPIView):
 
     serializer_class = TeamRosterSerializer
 
-    def get_queryset(self):
-        return Teams.objects.filter(team_abbr=self.kwargs["team"])
 
-    def get_serializer_context(self):
-        del self.kwargs["format"]
-        context = {"request": self.kwargs}
-        return context
-
-
-class TeamWeeklyDepthChartList(generics.ListAPIView):
+class TeamWeeklyDepthChartList(TeamsAbstractInfoRetrieve):
     """
-    This view returns a list of all Rostered players on a team
-    filtered by week
+    This view returns a team's Depth Chart filtered by week
     """
 
     serializer_class = TeamDepthChartSerializer
-
-    def get_queryset(self):
-        return Teams.objects.filter(team_abbr=self.kwargs["team"])
-
-    def get_serializer_context(self):
-        del self.kwargs["format"]
-        context = {"request": self.kwargs}
-        return context
 
 
 class TeamDetail(generics.RetrieveUpdateDestroyAPIView):

@@ -56,6 +56,7 @@ class DepthChart(models.Model):
         related_name="team_depth",
         db_column="team",
         verbose_name="team",
+        name="team"
     )
     week = IntegerField()
     game_type = CharField(max_length=5)
