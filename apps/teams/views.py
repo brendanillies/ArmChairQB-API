@@ -23,7 +23,8 @@ class TeamsAbstractInfoRetrieve(generics.RetrieveAPIView):
     lookup_field = "team_abbr"
 
     def get_serializer_context(self):
-        del self.kwargs["format"]
+        if "format" in self.kwargs:
+            del self.kwargs["format"]
         context = {"request": self.kwargs}
         return context
 
