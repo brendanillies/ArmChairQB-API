@@ -11,6 +11,7 @@ class TeamList(generics.ListCreateAPIView):
 
     queryset = Teams.objects.all()
     serializer_class = TeamSerializer
+    lookup_field = "team"
 
 
 class TeamsAbstractInfoRetrieve(generics.RetrieveAPIView):
@@ -20,7 +21,6 @@ class TeamsAbstractInfoRetrieve(generics.RetrieveAPIView):
 
     queryset = Teams.objects.all()
     lookup_url_kwarg = "team"
-    lookup_field = "team_abbr"
 
     def get_serializer_context(self):
         if "format" in self.kwargs:
@@ -53,6 +53,7 @@ class TeamDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Teams.objects.all()
     serializer_class = TeamSerializer
+    lookup_field = "team"
 
 
 # @api_view(["GET", "POST"])

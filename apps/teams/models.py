@@ -7,7 +7,7 @@ class Teams(models.Model):
         verbose_name_plural = "teams"
         db_table = "Teams"
 
-    team_abbr = CharField(primary_key=True, max_length=4)
+    team = CharField(primary_key=True, max_length=4)
     team_name = CharField(max_length=25)
     team_id = IntegerField()
     team_nick = CharField(max_length=15)
@@ -25,4 +25,4 @@ class Teams(models.Model):
     team_logo_squared = CharField(max_length=255)
 
     def __str__(self) -> str:
-        return f"{self.team_name} ({self.team_abbr})"
+        return f"{self.team_name} ({self.team})"

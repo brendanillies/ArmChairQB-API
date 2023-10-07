@@ -22,3 +22,4 @@ class PlayerIdentifierDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = PlayerIdentifier.objects.all()
     serializer_class = PlayerIdentifierSerializer
+    lookup_field = "gsis_id"

@@ -22,4 +22,4 @@ class RosterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Roster
         list_serializer_class = FilteredListSerializer
-        fields = ["week", "player_name", "gsis", "position", "status"]
+        fields = ["week", "player_name", "gsis_id", "position", "status"]

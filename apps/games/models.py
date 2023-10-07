@@ -47,7 +47,10 @@ class Schedule(models.Model):
         db_column="espn_game_id",
     )
     div_game = IntegerField(
-        editable=False, verbose_name="divisional_game", db_column="divisional_game"
+        editable=False,
+        name="divisional_game",
+        verbose_name="divisional_game",
+        db_column="divisional_game",
     )
     stadium_id = ForeignKey(Stadium, on_delete=RESTRICT, editable=False)
     surface = CharField(max_length=10, default="")

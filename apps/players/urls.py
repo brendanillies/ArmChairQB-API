@@ -5,7 +5,7 @@ from players import views
 
 urlpatterns = [
     path("api/playerIdentifiers/", views.PlayerIdentifierList.as_view()),
-    path("api/playerIdentifiers/<str:pk>/", views.PlayerIdentifierDetail.as_view()),
+    path("api/playerIdentifiers/<str:gsis_id>/", views.PlayerIdentifierDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

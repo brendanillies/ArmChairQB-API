@@ -15,7 +15,7 @@ class TeamDepthChartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Teams
-        fields = ["team_abbr", "team_depth"]
+        fields = ["team", "team_depth"]
 
 
 class TeamRosterSerializer(serializers.ModelSerializer):
@@ -23,4 +23,4 @@ class TeamRosterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Teams
-        fields = ["team_abbr", "team_roster"]
+        fields = ["team", "team_roster"]

@@ -8,7 +8,7 @@ class PlayerIdentifier(models.Model):
         verbose_name_plural = "Identifiers"
         db_table = "PlayerIdentifiers"
 
-    gsis_id = CharField(max_length=12, primary_key=True, db_column="player_id")
+    gsis_id = CharField(max_length=12, primary_key=True)
 
     espn_id = IntegerField(null=True)
     yahoo_id = IntegerField(null=True)
@@ -36,7 +36,7 @@ class Roster(models.Model):
     headshot = CharField(max_length=255, default="")
 
     gsis_id = ForeignKey(
-        PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster", name="gsis"
+        PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster"
     )
 
     def __str__(self) -> str:
@@ -55,13 +55,13 @@ class DepthChart(models.Model):
         related_name="team_depth",
         db_column="team",
         verbose_name="team",
-        name="team"
+        name="team",
     )
     week = IntegerField()
     depth_team = IntegerField()
     formation = CharField(max_length=15)
     gsis_id = ForeignKey(
-        PlayerIdentifier, on_delete=RESTRICT, related_name="player_depth", name="gsis"
+        PlayerIdentifier, on_delete=RESTRICT, related_name="player_depth"
     )
     jersey_number = IntegerField()
     position = CharField(max_length=4)
