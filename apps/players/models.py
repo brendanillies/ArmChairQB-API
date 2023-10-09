@@ -1,18 +1,23 @@
 from django.db import models
-from django.db.models import CharField, IntegerField, RESTRICT, ForeignKey
+from django.db.models import CharField, IntegerField, RESTRICT, ForeignKey, FloatField
 import pandas as pd
 
 
 class PlayerIdentifier(models.Model):
     class Meta:
-        verbose_name_plural = "Identifiers"
+        verbose_name_plural = "Player Identifiers"
         db_table = "PlayerIdentifiers"
 
     gsis_id = CharField(max_length=12, primary_key=True)
-
     espn_id = IntegerField(null=True)
     yahoo_id = IntegerField(null=True)
-    name = CharField(max_length=50)
+    name = CharField(
+        max_length=50, name="player_name", db_column="player_name", default=""
+    )
+    college = CharField(max_length=30, null=True)
+    headshot = CharField(max_length=255, default="")
+    age = FloatField(null=True)
+
     db_season = IntegerField(null=True)
 
     def __str__(self) -> str:
@@ -26,21 +31,18 @@ class Roster(models.Model):
         verbose_name_plural = "Rosters"
         db_table = "Rosters"
 
-    season = IntegerField()
-    team = ForeignKey("teams.Teams", on_delete=RESTRICT, related_name="team_roster")
-    position = CharField(max_length=4)
-    status = CharField(max_length=5)
-    player_name = CharField(max_length=50)
-    week = IntegerField()
-    college = CharField(max_length=30)
-    headshot = CharField(max_length=255, default="")
-
     gsis_id = ForeignKey(
         PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster"
     )
+    season = IntegerField()
+    week = IntegerField()
+    team = ForeignKey("teams.Teams", on_delete=RESTRICT, related_name="team_roster")
+    status = CharField(max_length=5)
 
     def __str__(self) -> str:
-        return f"{self.player_name} - Season {self.season}, Position {self.position}, Week {self.week}"
+        return (
+            f"{self.gsis_id.player_roster.name} - {self.team}, Season {self.season}, Week {self.week}"
+        )
 
 
 class DepthChart(models.Model):
@@ -48,32 +50,28 @@ class DepthChart(models.Model):
         verbose_name_plural = "Depth Charts"
         db_table = "DepthCharts"
 
-    season = IntegerField()
-    club_code = ForeignKey(
-        "teams.Teams",
-        on_delete=RESTRICT,
-        related_name="team_depth",
-        db_column="team",
-        verbose_name="team",
-        name="team",
-    )
-    week = IntegerField()
-    depth_team = IntegerField()
-    formation = CharField(max_length=15)
     gsis_id = ForeignKey(
         PlayerIdentifier, on_delete=RESTRICT, related_name="player_depth"
     )
-    jersey_number = IntegerField()
+    season = IntegerField()
+    team = ForeignKey(
+        "teams.Teams",
+        on_delete=RESTRICT,
+        related_name="team_depth",
+    )
+    week = IntegerField()
+    depth = IntegerField()
+    formation = CharField(max_length=15)
     position = CharField(max_length=4)
     depth_position = CharField(max_length=4, blank=True)
-    full_name = CharField(max_length=50)
 
     def __str__(self) -> str:
         return f"""
-            {self.full_name} ({self.club_code}) -
-            Week: {self.week} ({self.game_type}),
-            Depth: {self.depth_team},
-            Position: {self.position} ({self.depth_position})
+            {self.gsis_id.name} ({self.team}) -
+            Week: {self.week},
+            Depth: {self.depth},
+            Depth Position: {self.depth_position},
+            Position: {self.position}
             """
 
     def save(self, *args, **kwargs):

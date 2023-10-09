@@ -18,12 +18,11 @@ class ImportCSVDepthChartForm(Form):
     upload_depth_chart_file = FileField()
 
 
-@admin.register(PlayerIdentifier, Roster, DepthChart)
 class PlayersAdmin(admin.ModelAdmin):
     change_list_template = "admin/players/change_list.html"
 
     @staticmethod
-    def __create_player_identifier_objects(file):
+    def __clean_player_ids(file):
         df = pd.read_csv(
             file,
             usecols=["gsis_id", "espn_id", "yahoo_id", "name", "db_season"],
@@ -43,49 +42,46 @@ class PlayersAdmin(admin.ModelAdmin):
         ]
         df.drop(index=dup_df.index, inplace=True)
 
-        ids = (PlayerIdentifier(**record) for record in df.to_dict("records"))
-        PlayerIdentifier.objects.bulk_create(ids, batch_size=1000)
-        return
+        # ids = (PlayerIdentifier(**record) for record in df.to_dict("records"))
+        # PlayerIdentifier.objects.bulk_create(ids, batch_size=1000)
+        return df
 
     @staticmethod
-    def __create_depth_chart_objects(file):
+    def __clean_depth_charts(file):
         df = pd.read_csv(
             file,
             usecols=[
                 "season",
                 "club_code",
                 "week",
-                "game_type",
                 "depth_team",
                 "formation",
                 "gsis_id",
-                "jersey_number",
                 "position",
                 "depth_position",
-                "full_name",
             ],
-        ).rename(columns={"club_code": "club_code_id"})
-        df["club_code_id"].replace({"LA": "LAR"}, inplace=True)
+        ).rename(columns={"club_code": "team_id", "depth_team": "depth"})
+        df["team_id"].replace({"LA": "LAR"}, inplace=True)
 
-        objs = list()
-        for record in df.to_dict("records"):
-            PlayerIdentifier.objects.get_or_create(
-                gsis_id=record["gsis_id"],
-                defaults={
-                    "espn_id": None,
-                    "yahoo_id": None,
-                    "name": record["full_name"],
-                    "db_season": None,
-                },
-            )
+        # objs = list()
+        # for record in df.to_dict("records"):
+        #     PlayerIdentifier.objects.get_or_create(
+        #         gsis_id=record["gsis_id"],
+        #         defaults={
+        #             "espn_id": None,
+        #             "yahoo_id": None,
+        #             "name": record["full_name"],
+        #             "db_season": None,
+        #         },
+        #     )
 
-            objs.append(DepthChart(**record))
+        #     objs.append(DepthChart(**record))
 
-        DepthChart.objects.bulk_create(objs, batch_size=1000)
-        return
+        # DepthChart.objects.bulk_create(objs, batch_size=1000)
+        return df
 
     @staticmethod
-    def __create_roster_objects(file):
+    def __clean_rosters(file):
         df = pd.read_csv(
             file,
             usecols=[
@@ -93,38 +89,61 @@ class PlayersAdmin(admin.ModelAdmin):
                 "team",
                 "position",
                 "status",
-                "player_name",
                 "week",
-                "game_type",
-                "college",
                 "player_id",
                 "espn_id",
                 "yahoo_id",
             ],
-        ).rename(columns={"team": "team_id", "player_id": "gsis_id"})
+        ).rename(
+            columns={
+                "team": "team_id",
+                "player_id": "gsis_id",
+                "headshot_url": "headshot",
+            }
+        )
         df["team_id"].replace({"LA": "LAR"}, inplace=True)
 
-        objs = list()
-        for record in df.to_dict("records"):
-            PlayerIdentifier.objects.get_or_create(
-                gsis_id=record["gsis_id"],
-                defaults={
-                    "espn_id": None
-                    if pd.isna(record["espn_id"])
-                    else record["espn_id"],
-                    "yahoo_id": None
-                    if pd.isna(record["yahoo_id"])
-                    else record["yahoo_id"],
-                    "name": record["player_name"],
-                    "db_season": None,
-                },
-            )
+        # objs = list()
+        # for record in df.to_dict("records"):
+        #     PlayerIdentifier.objects.get_or_create(
+        #         gsis_id=record["gsis_id"],
+        #         defaults={
+        #             "espn_id": None
+        #             if pd.isna(record["espn_id"])
+        #             else record["espn_id"],
+        #             "yahoo_id": None
+        #             if pd.isna(record["yahoo_id"])
+        #             else record["yahoo_id"],
+        #             "name": record["player_name"],
+        #             "db_season": None,
+        #         },
+        #     )
 
-            del record["espn_id"], record["yahoo_id"]
-            objs.append(Roster(**record))
+        #     del record["espn_id"], record["yahoo_id"]
+        #     objs.append(Roster(**record))
 
-        Roster.objects.bulk_create(objs, batch_size=1000)
-        return
+        # Roster.objects.bulk_create(objs, batch_size=1000)
+        return df
+
+    def __clean_files(
+        self,
+        player_ids: pd.DataFrame,
+        depth_charts: pd.DataFrame,
+        rosters: pd.DataFrame,
+    ):
+        player_ids = self.__clean_player_ids(player_ids)
+        rosters = self.__clean_rosters(rosters)
+        depth_charts = self.__clean_depth_charts(depth_charts)
+
+        # Add any Player `gsis_id` not existent in player_ids from rosters & depth charts
+        full = player_ids.merge(
+            rosters[["gsis_id", "espn_id", "yahoo_id"]], how="outer", on="gsis_id"
+        ).merge(depth_charts["gsis_id"], how="outer", on="gsis_id")
+        full.to_csv("test.csv")
+
+        # full = player_ids.merge(depth_charts, how="outer", on="gsis_id").merge(rosters, how="outer", on="gsis_id")
+
+        return player_ids, depth_charts, rosters
 
     def get_urls(self):
         urls = super().get_urls()
@@ -134,16 +153,19 @@ class PlayersAdmin(admin.ModelAdmin):
     def upload_csv(self, request):
         # TODO: If records exist, bulk_update
         if request.method == "POST":
-            upload_player_identifier_file = request.FILES[
-                "upload_player_identifier_file"
-            ]
-            self.__create_player_identifier_objects(upload_player_identifier_file)
+            player_ids = request.FILES["upload_player_identifier_file"]
+            depth_charts = request.FILES["upload_depth_chart_file"]
+            rosters = request.FILES["upload_roster_file"]
 
-            upload_depth_chart_file = request.FILES["upload_depth_chart_file"]
-            self.__create_depth_chart_objects(upload_depth_chart_file)
+            player_ids, depth_charts, rosters = self.__clean_files(
+                player_ids, depth_charts, rosters
+            )
 
-            upload_roster_file = request.FILES["upload_roster_file"]
-            self.__create_roster_objects(upload_roster_file)
+            # self.__create_player_identifier_objects(upload_player_identifier_file)
+
+            # self.__create_depth_chart_objects(upload_depth_chart_file)
+
+            # self.__create_roster_objects(upload_roster_file)
 
             self.message_user(request, "Your files have been imported")
 
@@ -154,3 +176,18 @@ class PlayersAdmin(admin.ModelAdmin):
         }
 
         return render(request, "admin/players/import-csv.html", data)
+
+
+@admin.register(PlayerIdentifier)
+class PlayerIdentifierAdmin(PlayersAdmin):
+    list_display = ["player_name", "gsis_id", "espn_id", "yahoo_id", "college"]
+
+
+@admin.register(Roster)
+class RosterAdmin(PlayersAdmin):
+    list_display = ["team", "season", "week", "status"]
+
+
+@admin.register(DepthChart)
+class DepthChartAdmin(PlayersAdmin):
+    list_display = ["team", "season", "week", "depth", "position", "depth_position"]
