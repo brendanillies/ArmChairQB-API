@@ -83,6 +83,10 @@ class PlayersAdmin(admin.ModelAdmin):
                 "espn_id",
                 "yahoo_id",
             ],
+            dtype={
+                "espn_id": pd.Int32Dtype(),
+                "yahoo_id": pd.Int32Dtype(),
+            }
         ).rename(
             columns={
                 "team": "team_id",
@@ -105,23 +109,36 @@ class PlayersAdmin(admin.ModelAdmin):
         depth_charts = self.__clean_depth_charts(depth_charts)
 
         # Add any Player `gsis_id` not existent in player_ids from rosters & depth charts
-        full_id_df = player_ids.merge(
-            rosters[["gsis_id_id", "espn_id", "yahoo_id"]].rename(columns={"gsis_id_id": "gsis_id"}),
+        player_ids = player_ids.merge(
+            rosters[["gsis_id_id", "espn_id", "yahoo_id"]].rename(
+                columns={"gsis_id_id": "gsis_id"}
+            ),
             how="outer",
-            left_on="gsis_id",
-            right_on="gsis_id_id",
+            on="gsis_id",
         ).merge(
-            depth_charts["gsis_id_id"].rename(columns={"gsis_id_id": "gsis_id"}),
+            depth_charts["gsis_id_id"].rename("gsis_id"),
             how="outer",
-            left_on="gsis_id",
-            right_on="gsis_id_id",
+            on="gsis_id",
         )
         for col in ["espn_id", "yahoo_id"]:
-            full_id_df[col] = full_id_df[f"{col}_x"].fillna(full_id_df[f"{col}_y"])
-            full_id_df.drop(columns=[f"{col}_{merge_col}" for merge_col in ("x", "y")], inplace=True)
-            
-        player_ids = full_id_df.drop_duplicates()
+            player_ids[col] = player_ids[f"{col}_x"].fillna(player_ids[f"{col}_y"])
+            player_ids.drop(
+                columns=[f"{col}_{merge_col}" for merge_col in ("x", "y")], inplace=True
+            )
 
+        player_ids = player_ids.drop_duplicates()
+
+        # Drop unnecessary columns from file objects
+        roster_fields = [field.name for field in Roster._meta.get_fields()]
+        roster_fields.extend(["gsis_id_id", "team_id"])  # Id fields
+        rosters.drop(
+            columns=[
+                field
+                for field in rosters.columns
+                if field not in roster_fields
+            ],
+            inplace=True
+        )
         return player_ids, depth_charts, rosters
 
     @staticmethod
@@ -129,16 +146,16 @@ class PlayersAdmin(admin.ModelAdmin):
         player_ids: pd.DataFrame, depth_charts: pd.DataFrame, rosters: pd.DataFrame
     ):
         # PlayerIdentifier object upload
-        # objs = (PlayerIdentifier(**record) for record in player_ids.to_dict("records"))
-        # PlayerIdentifier.objects.bulk_create(objs, batch_size=1000)
+        objs = (PlayerIdentifier(**record) for record in player_ids.to_dict("records"))
+        PlayerIdentifier.objects.bulk_create(objs, batch_size=1000)
 
-        # # DepthChart object upload
-        # objs = (DepthChart(**record) for record in depth_charts.to_dict("records"))
-        # DepthChart.objects.bulk_create(objs, batch_size=1000)
+        # DepthChart object upload
+        objs = (DepthChart(**record) for record in depth_charts.to_dict("records"))
+        DepthChart.objects.bulk_create(objs, batch_size=1000)
 
-        # # Roster object upload
-        # objs = (Roster(**record) for record in rosters.to_dict("records"))
-        # Roster.objects.bulk_create(objs, batch_size=1000)
+        # Roster object upload
+        objs = (Roster(**record) for record in rosters.to_dict("records"))
+        Roster.objects.bulk_create(objs, batch_size=1000)
 
         return
 
