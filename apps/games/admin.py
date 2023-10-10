@@ -5,9 +5,6 @@ from django.shortcuts import render
 from .models import PlayByPlay, Schedule, Stadium
 import pandas as pd
 
-# Register your models here.
-admin.site.register(Stadium)
-
 
 class ImportCSVPlayByPlayForm(Form):
     upload_play_by_play_file = FileField()
@@ -17,7 +14,6 @@ class ImportCSVScheduleForm(Form):
     upload_schedule_file = FileField()
 
 
-@admin.register(PlayByPlay, Schedule)
 class GamesAdmin(admin.ModelAdmin):
     change_list_template = "admin/games/change_list.html"
 
@@ -99,3 +95,44 @@ class GamesAdmin(admin.ModelAdmin):
         }
 
         return render(request, "admin/games/import-csv.html", data)
+
+
+@admin.register(Stadium)
+class StadiumAdmin(GamesAdmin):
+    list_display = ["name", "stadium_id"]
+    search_fields = ["name"]
+
+
+@admin.register(Schedule)
+class ScheduleAdmin(GamesAdmin):
+    @admin.display(description="Away Team")
+    def get_away_team(self, obj):
+        return obj.away_team.team
+
+    @admin.display(description="Home Team")
+    def get_home_team(self, obj):
+        return obj.home_team.team
+
+    @admin.display(description="Stadium")
+    def get_stadium(self, obj):
+        return obj.stadium_id.name
+
+    list_display = [
+        "game_id",
+        "season",
+        "week",
+        "get_away_team",
+        "get_home_team",
+        "get_stadium",
+        "divisional_game",
+    ]
+    search_fields = [
+        "season",
+        "home_team_id__team__icontains",
+        "away_team_id__team__icontains",
+    ]
+
+
+@admin.register(PlayByPlay)
+class PlayByPlayAdmin(GamesAdmin):
+    ...
