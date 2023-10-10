@@ -20,10 +20,10 @@ class PlayerIdentifier(models.Model):
 
     db_season = IntegerField(null=True)
 
-    def __str__(self) -> str:
-        return f"""{self.name}
-                (APP_ID: {self.gsis_id},
-                YAHOO_ID: {self.yahoo_id})"""
+    # def __str__(self) -> str:
+    #     return f"""{self.name}
+    #             (APP_ID: {self.gsis_id},
+    #             YAHOO_ID: {self.yahoo_id})"""
 
 
 class Roster(models.Model):
@@ -39,10 +39,10 @@ class Roster(models.Model):
     team = ForeignKey("teams.Teams", on_delete=RESTRICT, related_name="team_roster")
     status = CharField(max_length=5)
 
-    def __str__(self) -> str:
-        return (
-            f"{self.gsis_id.player_roster.name} - {self.team}, Season {self.season}, Week {self.week}"
-        )
+    # def __str__(self) -> str:
+    #     return (
+    #         f"{self.gsis_id.player_roster.name} - {self.team}, Season {self.season}, Week {self.week}"
+    #     )
 
 
 class DepthChart(models.Model):
