@@ -65,14 +65,14 @@ class DepthChart(models.Model):
     position = CharField(max_length=4)
     depth_position = CharField(max_length=4, blank=True)
 
-    def __str__(self) -> str:
-        return f"""
-            {self.gsis_id.name} ({self.team}) -
-            Week: {self.week},
-            Depth: {self.depth},
-            Depth Position: {self.depth_position},
-            Position: {self.position}
-            """
+    # def __str__(self) -> str:
+    #     return f"""
+    #         {self.gsis_id.name} ({self.team}) -
+    #         Week: {self.week},
+    #         Depth: {self.depth},
+    #         Depth Position: {self.depth_position},
+    #         Position: {self.position}
+    #         """
 
     def save(self, *args, **kwargs):
         if (
