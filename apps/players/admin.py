@@ -57,12 +57,14 @@ class PlayersAdmin(admin.ModelAdmin):
                 "gsis_id",
                 "position",
                 "depth_position",
+                "full_name",
             ],
         ).rename(
             columns={
                 "club_code": "team_id",
                 "depth_team": "depth",
                 "gsis_id": "gsis_id_id",
+                "full_name": "player_name",
             }
         )
         df["team_id"].replace({"LA": "LAR"}, inplace=True)
@@ -82,11 +84,12 @@ class PlayersAdmin(admin.ModelAdmin):
                 "player_id",
                 "espn_id",
                 "yahoo_id",
+                "player_name",
             ],
             dtype={
                 "espn_id": pd.Int32Dtype(),
                 "yahoo_id": pd.Int32Dtype(),
-            }
+            },
         ).rename(
             columns={
                 "team": "team_id",
@@ -110,17 +113,19 @@ class PlayersAdmin(admin.ModelAdmin):
 
         # Add any Player `gsis_id` not existent in player_ids from rosters & depth charts
         player_ids = player_ids.merge(
-            rosters[["gsis_id_id", "espn_id", "yahoo_id"]].rename(
+            rosters[["gsis_id_id", "espn_id", "yahoo_id", "player_name"]].rename(
                 columns={"gsis_id_id": "gsis_id"}
             ),
             how="outer",
             on="gsis_id",
         ).merge(
-            depth_charts["gsis_id_id"].rename("gsis_id"),
+            depth_charts[["gsis_id_id", "player_name"]].rename(
+                columns={"gsis_id_id": "gsis_id"}
+            ),
             how="outer",
             on="gsis_id",
         )
-        for col in ["espn_id", "yahoo_id"]:
+        for col in ["espn_id", "yahoo_id", "player_name"]:
             player_ids[col] = player_ids[f"{col}_x"].fillna(player_ids[f"{col}_y"])
             player_ids.drop(
                 columns=[f"{col}_{merge_col}" for merge_col in ("x", "y")], inplace=True
@@ -132,12 +137,19 @@ class PlayersAdmin(admin.ModelAdmin):
         roster_fields = [field.name for field in Roster._meta.get_fields()]
         roster_fields.extend(["gsis_id_id", "team_id"])  # Id fields
         rosters.drop(
+            columns=[field for field in rosters.columns if field not in roster_fields],
+            inplace=True,
+        )
+
+        depth_chart_fields = [field.name for field in DepthChart._meta.get_fields()]
+        depth_chart_fields.extend(["gsis_id_id", "team_id"])
+        depth_charts.drop(
             columns=[
                 field
-                for field in rosters.columns
-                if field not in roster_fields
+                for field in depth_charts.columns
+                if field not in depth_chart_fields
             ],
-            inplace=True
+            inplace=True,
         )
         return player_ids, depth_charts, rosters
 
@@ -191,13 +203,41 @@ class PlayersAdmin(admin.ModelAdmin):
 @admin.register(PlayerIdentifier)
 class PlayerIdentifierAdmin(PlayersAdmin):
     list_display = ["player_name", "gsis_id", "espn_id", "yahoo_id", "college"]
+    search_fields = ["player_name__icontains"]
 
 
 @admin.register(Roster)
 class RosterAdmin(PlayersAdmin):
-    list_display = ["team", "season", "week", "status"]
+    @admin.display(description="Player Name")
+    def get_player(self, obj):
+        return obj.gsis_id.player_name
+
+    list_display = ["get_player", "team", "season", "week", "status"]
+    search_fields = [
+        "gsis_id__player_name__icontains",
+        "team_id__team_name__icontains",
+        "team_id__team__icontains",
+    ]
 
 
 @admin.register(DepthChart)
 class DepthChartAdmin(PlayersAdmin):
-    list_display = ["team", "season", "week", "depth", "position", "depth_position"]
+    @admin.display(description="Player Name")
+    def get_player(self, obj):
+        return obj.gsis_id.player_name
+
+    list_display = [
+        "get_player",
+        "team",
+        "season",
+        "week",
+        "depth",
+        "position",
+        "depth_position",
+    ]
+    search_fields = [
+        "gsis_id__player_name__icontains",
+        "team_id__team_name__icontains",
+        "team_id__team__icontains",
+        "depth_position__icontains",
+    ]
