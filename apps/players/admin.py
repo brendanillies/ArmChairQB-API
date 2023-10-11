@@ -203,7 +203,7 @@ class PlayersAdmin(admin.ModelAdmin):
 @admin.register(PlayerIdentifier)
 class PlayerIdentifierAdmin(PlayersAdmin):
     list_display = ["player_name", "gsis_id", "espn_id", "yahoo_id", "college"]
-    search_fields = ["player_name__icontains"]
+    search_fields = ["player_name__icontains", "gsis_id"]
 
 
 @admin.register(Roster)
