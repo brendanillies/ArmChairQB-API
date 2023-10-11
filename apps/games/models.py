@@ -70,10 +70,10 @@ class PlayByPlay(models.Model):
         Schedule, related_name="pbp_game_ids", on_delete=RESTRICT, default=""
     )
     home_team = ForeignKey(
-        "teams.Teams", related_name="pbp_home_team", on_delete=RESTRICT, default=""
+        "teams.Teams", related_name="pbp_home_team", on_delete=RESTRICT, default="", name="home_team_id"
     )
     away_team = ForeignKey(
-        "teams.Teams", related_name="pbp_away_team", on_delete=RESTRICT, default=""
+        "teams.Teams", related_name="pbp_away_team", on_delete=RESTRICT, default="", name="away_team_id"
     )
     week = IntegerField(null=True, default=0)
     team_with_possession = ForeignKey(
@@ -180,7 +180,7 @@ class PlayByPlay(models.Model):
     sack = IntegerField(null=True, default=0)
     touchdown = IntegerField(null=True, default=0)
     pass_touchdown = IntegerField(null=True, default=0)
-    run_touchdown = IntegerField(null=True, default=0)
+    rush_touchdown = IntegerField(null=True, default=0)
     return_touchdown = IntegerField(null=True, default=0)
     extra_point_attempt = IntegerField(null=True, default=0)
     two_point_attempt = IntegerField(null=True, default=0)
@@ -243,3 +243,9 @@ class PlayByPlay(models.Model):
     defense_num_of_rushers = IntegerField(null=True, default=0)
     offense_player_gsis_ids = CharField(max_length=175, default="")
     defense_player_gsis_ids = CharField(max_length=175, default="")
+
+    def save(self, *args, **kwargs):
+        if self.play_type not in ("field_goal", "extra_point"):
+            self.field_goal_kick_distance = 0
+
+        super().save(*args, **kwargs)
