@@ -2,6 +2,7 @@ play_by_play_mapper = {
     "home_team": "home_team_id",
     "away_team": "away_team_id",
     "posteam": "team_with_possession",
+    "game_half": "half",
     "drive": "drive_num",
     "qtr": "quarter",
     "ydstogo": "yards_to_go",
@@ -35,7 +36,8 @@ play_by_play_mapper = {
     "series_result": "drive_result",
     "fixed_drive_result": "drive_result",
     "drive_inside20": "drive_inside_twenty",
-    "number_of_pash_rushers": "defense_num_of_rushers",
+    "number_of_pass_rushers": "defense_num_of_rushers",
     "offense_players": "offense_player_gsis_ids",
-    "defense_players": "defense_player_gsis_ids"
+    "defense_players": "defense_player_gsis_ids",
+    "kick_distance": "field_goal_kick_distance",
 }
