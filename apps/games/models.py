@@ -7,6 +7,7 @@ from django.db.models import (
     ForeignKey,
     RESTRICT,
 )
+from datetime import time
 
 
 class Stadium(models.Model):
@@ -65,34 +66,40 @@ class PlayByPlay(models.Model):
         verbose_name_plural = "Play By Play"
         db_table = "PlayByPlay"
 
-    game_id = ForeignKey(Schedule, related_name="pbp_game_ids", on_delete=RESTRICT)
+    game_id = ForeignKey(
+        Schedule, related_name="pbp_game_ids", on_delete=RESTRICT, default=""
+    )
     home_team = ForeignKey(
-        "teams.Teams", related_name="pbp_home_team", on_delete=RESTRICT
+        "teams.Teams", related_name="pbp_home_team", on_delete=RESTRICT, default=""
     )
     away_team = ForeignKey(
-        "teams.Teams", related_name="pbp_away_team", on_delete=RESTRICT
+        "teams.Teams", related_name="pbp_away_team", on_delete=RESTRICT, default=""
     )
     week = IntegerField(null=True, default=0)
     team_with_possession = ForeignKey(
-        "teams.Teams", related_name="pbp_team_with_possession", on_delete=RESTRICT
+        "teams.Teams",
+        related_name="pbp_team_with_possession",
+        on_delete=RESTRICT,
+        default="",
     )
     side_of_field = CharField(max_length=4, default="", null=True)
-    yardline_100 = IntegerField(null=True)
-    quarter_seconds_remaining = IntegerField(null=False)
-    half_seconds_remaining = IntegerField(null=False)
-    game_seconds_remaining = IntegerField(null=False)
+    yardline_100 = IntegerField(null=True, default=0)
+    quarter_seconds_remaining = IntegerField(null=False, default=0)
+    half_seconds_remaining = IntegerField(null=False, default=0)
+    game_seconds_remaining = IntegerField(null=False, default=0)
     half = CharField(max_length=8, default="", null=False)
-    quarter_end = IntegerField(null=False)
+    quarter_end = IntegerField(null=False, default=0)
     drive_num = IntegerField(default=0)
-    quarter = IntegerField(null=False)
+    quarter = IntegerField(null=False, default=0)
     down = IntegerField(null=True, default=0)
-    yards_to_go = IntegerField(null=False)
+    yards_to_go = IntegerField(null=False, default=0)
     drive_net_yards = IntegerField(null=True, default=0)
     desc = CharField(
         max_length=750,
         null=False,
         name="play_description",
         db_column="play_description",
+        default="",
     )
     play_type = CharField(max_length=20, default="", null=True)
     yards_gained = IntegerField(null=True, default=0)
@@ -112,22 +119,23 @@ class PlayByPlay(models.Model):
     field_goal_kick_distance = IntegerField(null=True, default=0)
     extra_point_result = CharField(max_length=6, null=True, default="")
     two_point_conv_result = CharField(max_length=7, null=True, default="")
-    home_timeouts_remaining = IntegerField()
-    away_timeouts_remaining = IntegerField()
+    home_timeouts_remaining = IntegerField(null=False, default=0)
+    away_timeouts_remaining = IntegerField(null=False, default=0)
     timeout_taken = IntegerField(null=True, default=0)
     timeout_team = ForeignKey(
-        "teams.Teams", related_name="pbp_timeout_team", on_delete=RESTRICT
+        "teams.Teams", related_name="pbp_timeout_team", on_delete=RESTRICT, default=""
     )
     touchdown_team = ForeignKey(
-        "teams.Teams", related_name="pbp_touchdown_team", on_delete=RESTRICT
+        "teams.Teams", related_name="pbp_touchdown_team", on_delete=RESTRICT, default=""
     )
     touchdown_gsis_id = ForeignKey(
         "players.PlayerIdentifier",
         related_name="pbp_touchdown_player",
         on_delete=RESTRICT,
+        default="",
     )
-    home_team_score = IntegerField(null=False)
-    away_team_score = IntegerField(null=False)
+    home_team_score = IntegerField(null=False, default=0)
+    away_team_score = IntegerField(null=False, default=0)
     punt_blocked = IntegerField(null=True, default=0)
     rush_first_down = IntegerField(null=True, default=0)
     pass_first_down = IntegerField(null=True, default=0)
@@ -153,6 +161,12 @@ class PlayByPlay(models.Model):
     fumble_out_of_bounds = IntegerField(null=True, default=0)
     fumble_lost = IntegerField(null=True, default=0)
     fumble = IntegerField(null=True, default=0)
+    fumbled_player_id = ForeignKey(
+        "players.PlayerIdentifier",
+        on_delete=RESTRICT,
+        related_name="pbp_fumbler",
+        default="",
+    )
     tackle_solo = IntegerField(null=True, default=0)
     tackle_assist = IntegerField(null=True, default=0)
     safety = IntegerField(null=True, default=0)
@@ -174,53 +188,58 @@ class PlayByPlay(models.Model):
     kickoff_attempt = IntegerField(null=True, default=0)
     punt_attempt = IntegerField(null=True, default=0)
     pass_complete = IntegerField(null=True, default=0)
-    pass_gsis_id = ForeignKey(
+    passer_gsis_id = ForeignKey(
         "players.PlayerIdentifier",
         related_name="pbp_passing_player",
         on_delete=RESTRICT,
+        default="",
     )
     pass_yards = IntegerField(null=True, default=0)
     receiver_gsis_id = ForeignKey(
         "players.PlayerIdentifier",
         related_name="pbp_receiving_player",
         on_delete=RESTRICT,
+        default="",
     )
     rusher_gsis_id = ForeignKey(
-        "players.PlayderIdentifier",
+        "players.PlayerIdentifier",
         related_name="pbp_rushing_player",
         on_delete=RESTRICT,
+        default="",
     )
     rush_yards = IntegerField(null=True, default=0)
     kicker_gsis_id = ForeignKey(
         "players.PlayerIdentifier",
         related_name="pbp_kicking_player",
         on_delete=RESTRICT,
+        default="",
     )
     penalty_team = ForeignKey(
-        "teams.Teams", related_name="pbp_penalty_team", on_delete=RESTRICT
+        "teams.Teams", related_name="pbp_penalty_team", on_delete=RESTRICT, default=""
     )
     penalty_gsis_id = ForeignKey(
         "players.PlayerIdentifier",
         related_name="pbp_penalty_player",
         on_delete=RESTRICT,
+        default="",
     )
     penalty_yards = IntegerField(null=True, default=0)
     penalty_type = CharField(max_length=75, null=True, default="")
     drive_result = CharField(max_length=25, null=True, default="")
     drive_play_count = IntegerField(null=True, default=0)
-    drive_possession_time = TimeField()
+    drive_time_of_possession = TimeField(default=time())
     drive_first_downs = IntegerField(null=True, default=0)
     drive_inside_twenty = IntegerField(null=True, default=0)
     drive_ended_with_score = IntegerField(null=True, default=0)
     drive_quarter_start = IntegerField(null=True, default=0)
     drive_quarter_end = IntegerField(null=True, default=0)
     drive_yards_penalized = IntegerField(null=True, default=0)
-    drive_start_transition = CharField(max_length=30)
-    drive_end_transition = CharField(max_length=30)
+    drive_start_transition = CharField(max_length=30, default="")
+    drive_end_transition = CharField(max_length=30, default="")
     offense_formation = CharField(max_length=15, null=True, default="")
     offense_personnel = CharField(max_length=15, null=True, default="")
     defenders_in_box = IntegerField(null=True, default=0)
     defense_personnel = CharField(max_length=15, null=True, default="")
     defense_num_of_rushers = IntegerField(null=True, default=0)
-    offense_player_gsis_ids = CharField(max_length=175)
-    defense_player_gsis_ids = CharField(max_length=175)
+    offense_player_gsis_ids = CharField(max_length=175, default="")
+    defense_player_gsis_ids = CharField(max_length=175, default="")
