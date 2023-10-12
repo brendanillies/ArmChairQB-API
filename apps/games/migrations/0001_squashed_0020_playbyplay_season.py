@@ -6,28 +6,11 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        (
-            "games",
-            "0001_squashed_0010_alter_schedule_away_team_alter_schedule_home_team_and_more",
-        ),
-        ("games", "0011_rename_div_game_schedule_divisional_game"),
-        ("games", "0012_alter_playbyplay_options_playbyplay_away_team_and_more"),
-        ("games", "0013_rename_run_gap_playbyplay_rush_gap_and_more"),
-        ("games", "0014_alter_playbyplay_drive_time_of_possession"),
-        ("games", "0015_alter_playbyplay_defense_player_gsis_ids_and_more"),
-        ("games", "0016_alter_playbyplay_drive_end_transition_and_more"),
-        ("games", "0017_alter_playbyplay_drive_num"),
-        ("games", "0018_alter_playbyplay_team_with_possession"),
-        ("games", "0019_alter_playbyplay_fumbled_gsis_and_more"),
-        ("games", "0020_playbyplay_season"),
-    ]
-
     initial = True
 
     dependencies = [
         ("teams", "0002_rename_team_abbr_teams_team"),
-        ("players", "0011_alter_playeridentifier_options_and_more"),
+        ("games", "0001_squashed_0010_alter_schedule_away_team_alter_schedule_home_team_and_more"),
     ]
 
     operations = [
