@@ -10,26 +10,19 @@ class PlayerStats(models.Model):
     gsis_id = ForeignKey(
         "players.PlayerIdentifier",
         on_delete=RESTRICT,
-        related_name="player_stats",
-        db_column="gsis_id",
+        related_name="player_stats"
     )
     season = IntegerField(null=False, blank=False)
     week = IntegerField(null=False, blank=False)
     team = ForeignKey(
         "teams.Teams",
         on_delete=RESTRICT,
-        related_name="player_stats_team",
-        name="team",
-        db_column="team_id",
-        default=""
+        related_name="player_stats_team"
     )
-    opponent = ForeignKey(
+    opponent_team = ForeignKey(
         "teams.Teams",
         on_delete=RESTRICT,
-        related_name="player_stats_opponent",
-        name="opponent_team",
-        db_column="opponent_team_id",
-        default=""
+        related_name="player_stats_opponent"
     )
     completions = IntegerField(null=False, blank=False)
     attempts = IntegerField(null=False, blank=False)

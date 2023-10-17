@@ -5,7 +5,7 @@ from django.urls import path
 import pandas as pd
 
 from .models import PlayerStats
-from .util import stats_mapper
+from .upload import stats_mapper
 
 
 class ImportCSVPlayerStatsForm(Form):
@@ -15,7 +15,7 @@ class ImportCSVPlayerStatsForm(Form):
 @admin.register(PlayerStats)
 class PlayerStatsAdmin(admin.ModelAdmin):
     change_list_template = "admin/stats/change_list.html"
-    list_display = ["get_player", "season", "week", "team", "opponent_team"]
+    list_display = ["get_player", "season", "week", "get_team", "get_opponent_team"]
     ordering = ["-season", "-week", "team"]
     search_fields = [
         "gsis_id__player_name__icontains",
@@ -26,6 +26,14 @@ class PlayerStatsAdmin(admin.ModelAdmin):
     @admin.display(description="Player Name")
     def get_player(self, obj):
         return obj.gsis_id.player_name
+
+    @admin.display(description="Team")
+    def get_team(self, obj):
+        return obj.team
+
+    @admin.display(description="Opponent")
+    def get_opponent_team(self, obj):
+        return obj.opponent_team
 
     @staticmethod
     def __save_objects(file):

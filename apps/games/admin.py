@@ -1,12 +1,18 @@
-from django.contrib import admin
-from django.forms import Form, FileField
-from django.urls import path
-from django.db import IntegrityError
-from django.shortcuts import render
-from .models import PlayByPlay, Schedule, Stadium
-import pandas as pd
-from .util import play_by_play_mapper, play_by_play_times
 from datetime import datetime
+
+import pandas as pd
+from django.contrib import admin
+from django.forms import FileField, Form
+from django.shortcuts import render
+from django.urls import path
+
+from .models import PlayByPlay, Schedule, Stadium
+from .upload import (
+    play_by_play_mapper,
+    play_by_play_times,
+    schedule_mapper,
+    schedule_datetimes,
+)
 
 
 class ImportCSVPlayByPlayForm(Form):
@@ -40,31 +46,13 @@ class GamesAdmin(admin.ModelAdmin):
 
         df = pd.read_csv(
             file,
-            usecols=[
-                "game_id",
-                "season",
-                "game_type",
-                "week",
-                "gameday",
-                "weekday",
-                "gametime",
-                "away_team",
-                "home_team",
-                "location",
-                "overtime",
-                "espn",
-                "div_game",
-                "stadium_id",
-                "surface",
-                "roof",
-            ],
-            parse_dates=["gameday"],
+            usecols=list(schedule_mapper.keys()) + schedule_datetimes,
+            parse_dates=schedule_datetimes,
         ).rename(
             columns={
-                "away_team": "away_team_id",
-                "home_team": "home_team_id",
-                "stadium_id": "stadium_id_id",
-                "espn": "espn_game_id",
+                key: val["name"]
+                for key, val in play_by_play_mapper.items()
+                if val.get("name") is not None
             }
         )
         df["home_team_id"].replace({"LA": "LAR"}, inplace=True)
@@ -139,14 +127,6 @@ class StadiumAdmin(GamesAdmin):
 
 @admin.register(Schedule)
 class ScheduleAdmin(GamesAdmin):
-    @admin.display(description="Away Team")
-    def get_away_team(self, obj):
-        return obj.away_team.team
-
-    @admin.display(description="Home Team")
-    def get_home_team(self, obj):
-        return obj.home_team.team
-
     @admin.display(description="Stadium")
     def get_stadium(self, obj):
         return obj.stadium_id.name
@@ -155,15 +135,17 @@ class ScheduleAdmin(GamesAdmin):
         "game_id",
         "season",
         "week",
-        "get_away_team",
-        "get_home_team",
+        "away_team",
+        "home_team",
         "get_stadium",
         "divisional_game",
     ]
     search_fields = [
         "season",
-        "home_team_id__team__icontains",
-        "away_team_id__team__icontains",
+        "home_team__team__icontains",
+        "home_team__team_name__icontains",
+        "away_team__team__icontains",
+        "away_team__team_name__icontains",
     ]
 
 
@@ -174,8 +156,8 @@ class PlayByPlayAdmin(GamesAdmin):
         "game_id",
         "season",
         "week",
-        "home_team",
         "away_team",
+        "home_team",
         "quarter",
         "game_seconds_remaining",
     ]

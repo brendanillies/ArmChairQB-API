@@ -32,7 +32,9 @@ class Roster(models.Model):
         db_table = "Rosters"
 
     gsis_id = ForeignKey(
-        PlayerIdentifier, on_delete=RESTRICT, related_name="player_roster"
+        PlayerIdentifier,
+        on_delete=RESTRICT,
+        related_name="player_roster"
     )
     season = IntegerField()
     week = IntegerField()
@@ -40,9 +42,7 @@ class Roster(models.Model):
     status = CharField(max_length=5)
 
     def __str__(self) -> str:
-        return (
-            f"{self.gsis_id.player_name} - {self.team}, Season {self.season}, Week {self.week}"
-        )
+        return f"{self.gsis_id.player_name} - {self.team}, Season {self.season}, Week {self.week}"
 
 
 class DepthChart(models.Model):
@@ -51,7 +51,9 @@ class DepthChart(models.Model):
         db_table = "DepthCharts"
 
     gsis_id = ForeignKey(
-        PlayerIdentifier, on_delete=RESTRICT, related_name="player_depth"
+        PlayerIdentifier,
+        on_delete=RESTRICT,
+        related_name="player_depth"
     )
     season = IntegerField()
     team = ForeignKey(

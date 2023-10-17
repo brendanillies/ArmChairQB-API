@@ -1,5 +1,23 @@
 import pandas as pd
 
+schedule_datetimes = ["gametime", "gameday"]
+schedule_mapper = {
+    "game_id": {"dtype": "string"},
+    "season": {"dtype": pd.Int16Dtype()},
+    "game_type": {"dtype": "string"},
+    "week": {"dtype": pd.Int8Dtype()},
+    "weekday": {"dtype": "string"},
+    "away_team": {"dtype": "string", "name": "away_team_id"},
+    "home_team": {"dtype": "string", "name": "home_team_id"},
+    "location": {"dtype": "string"},
+    "overtime": {"dtype": pd.BooleanDtype()},
+    "espn": {"dtype": pd.Int64Dtype(), "name": "espn_game_id"},
+    "div_game": {"dtype": pd.BooleanDtype()},
+    "stadium_id": {"dtype": "string", "name": "stadium_id_id"},
+    "surface": {"dtype": "string"},
+    "roof": {"dtype": "string"}
+}
+
 
 play_by_play_times = ["drive_time_of_possession"]
 play_by_play_mapper = {
