@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 import sys
+from decouple import config, Csv
 
 from pathlib import Path
 
@@ -24,12 +25,15 @@ sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@9dh3f(-id3ty&=zc*zu+0kau#o^wmb-g4un60=5o-xt9$h_ok"
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-@9dh3f(-id3ty&=zc*zu+0kau#o^wmb-g4un60=5o-xt9$h_ok", cast=str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+else:
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 # Application definition
@@ -81,7 +85,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ArmChairQB.wsgi.application"
 
-CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
+CORS_ORIGIN_WHITELIST = ["http://localhost:3000", "http://127.0.0.1:3000"]
+CORS_ALLOW_METHODS = ("GET", "DELETE", "POST", "PATCH", "PUT")
+
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
