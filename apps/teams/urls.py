@@ -8,14 +8,14 @@ urlpatterns = [
     # path("api/teams/<str:pk>/", views.teams_detail),  # Gets API
     # path("api/teams/<str:pk>/", views.teams_detail),  # Gets JSON
     path("api/teams/", views.TeamList.as_view()),
-    path("api/teams/team/<str:team>", views.TeamDetail.as_view()),
-    path("api/teams/team/<str:team>/", views.TeamDetail.as_view()),
+    path("api/teams/<str:team>", views.TeamList.as_view()),
+    path("api/teams/<str:team>/", views.TeamList.as_view()),
     path(
-        "api/teams/team/<str:team>/roster/week/<int:week>/",
+        "api/teams/<str:team>/roster/week/<int:week>/",
         views.TeamWeeklyRosterList.as_view(),
     ),
     path(
-        "api/teams/team/<str:team>/depth/week/<int:week>/",
+        "api/teams/<str:team>/depth/week/<int:week>/",
         views.TeamWeeklyDepthChartList.as_view(),
     ),
 ]

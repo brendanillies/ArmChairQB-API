@@ -9,9 +9,14 @@ class TeamList(generics.ListCreateAPIView):
     List all Teams, or create a new Team
     """
 
-    queryset = Teams.objects.all()
     serializer_class = TeamSerializer
     lookup_field = "team"
+
+    def get_queryset(self):
+        team = self.kwargs.get("team", None)
+        if team is not None:
+            return Teams.objects.filter(team__icontains=team)
+        return Teams.objects.all()
 
 
 class TeamsAbstractInfoRetrieve(generics.RetrieveAPIView):
@@ -44,16 +49,6 @@ class TeamWeeklyDepthChartList(TeamsAbstractInfoRetrieve):
     """
 
     serializer_class = TeamDepthChartSerializer
-
-
-class TeamDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Retrieve, update or delete a Teams instance.
-    """
-
-    queryset = Teams.objects.all()
-    serializer_class = TeamSerializer
-    lookup_field = "team"
 
 
 # @api_view(["GET", "POST"])
