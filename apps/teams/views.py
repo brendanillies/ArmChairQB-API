@@ -4,7 +4,7 @@ from .models import Teams
 from .serializers import TeamDepthChartSerializer, TeamRosterSerializer, TeamSerializer
 
 
-class TeamList(generics.ListCreateAPIView):
+class TeamList(generics.ListAPIView):
     """
     List all Teams, or create a new Team
     """
@@ -34,7 +34,7 @@ class TeamsAbstractInfoRetrieve(generics.RetrieveAPIView):
         return context
 
 
-class TeamWeeklyRosterList(TeamsAbstractInfoRetrieve):
+class TeamRoster(TeamsAbstractInfoRetrieve):
     """
     This view returns a list of all Rostered players on a team
     filtered by week
@@ -43,7 +43,7 @@ class TeamWeeklyRosterList(TeamsAbstractInfoRetrieve):
     serializer_class = TeamRosterSerializer
 
 
-class TeamWeeklyDepthChartList(TeamsAbstractInfoRetrieve):
+class TeamDepthChart(TeamsAbstractInfoRetrieve):
     """
     This view returns a team's Depth Chart filtered by week
     """

@@ -11,12 +11,12 @@ urlpatterns = [
     path("api/teams/<str:team>", views.TeamList.as_view()),
     path("api/teams/<str:team>/", views.TeamList.as_view()),
     path(
-        "api/teams/<str:team>/roster/week/<int:week>/",
-        views.TeamWeeklyRosterList.as_view(),
+        "api/teams/<str:team>/roster/",
+        views.TeamRoster.as_view(),
     ),
     path(
-        "api/teams/<str:team>/depth/week/<int:week>/",
-        views.TeamWeeklyDepthChartList.as_view(),
+        "api/teams/<str:team>/depth",
+        views.TeamDepthChart.as_view(),
     ),
 ]
 
