@@ -1,9 +1,11 @@
-from django.contrib import admin
-from django.forms import Form, FileField
-from django.urls import path
-from django.shortcuts import render
 import pandas as pd
-from .models import PlayerIdentifier, Roster, DepthChart
+from django.contrib import admin
+from django.forms import FileField, Form
+from django.shortcuts import render
+from django.urls import path
+
+from .models import DepthChart, PlayerIdentifier, Roster
+from .upload import depth_charts_mapper, players_mapper, rosters_mapper
 
 
 class ImportCSVRosterForm(Form):
@@ -25,13 +27,18 @@ class PlayersAdmin(admin.ModelAdmin):
     def __clean_player_ids(file):
         df = pd.read_csv(
             file,
-            usecols=["gsis_id", "espn_id", "yahoo_id", "name", "db_season", "college"],
+            usecols=list(players_mapper.keys()),
             dtype={
-                "espn_id": pd.Int32Dtype(),
-                "yahoo_id": pd.Int32Dtype(),
-                "db_season": pd.Int16Dtype(),
+                key: val["dtype"]
+                for key, val in players_mapper.items()
             },
-        ).rename(columns={"name": "player_name"})
+        ).rename(
+            columns={
+                key: val["name"]
+                for key, val in players_mapper.items()
+                if val.get("name") is not None
+            }
+        )
         df = df[~pd.isna(df["gsis_id"])]
 
         # Drop duplicates that don't have an `espn_id` or `yahoo_id`
@@ -48,23 +55,16 @@ class PlayersAdmin(admin.ModelAdmin):
     def __clean_depth_charts(file):
         df = pd.read_csv(
             file,
-            usecols=[
-                "season",
-                "club_code",
-                "week",
-                "depth_team",
-                "formation",
-                "gsis_id",
-                "position",
-                "depth_position",
-                "full_name",
-            ],
+            usecols=list(depth_charts_mapper.keys()),
+            dtype={
+                key: val["dtype"]
+                for key, val in depth_charts_mapper.items()
+            },
         ).rename(
             columns={
-                "club_code": "team_id",
-                "depth_team": "depth",
-                "gsis_id": "gsis_id_id",
-                "full_name": "player_name",
+                key: val["name"]
+                for key, val in depth_charts_mapper.items()
+                if val.get("name") is not None
             }
         )
         df["team_id"].replace({"LA": "LAR"}, inplace=True)
@@ -75,26 +75,16 @@ class PlayersAdmin(admin.ModelAdmin):
     def __clean_rosters(file):
         df = pd.read_csv(
             file,
-            usecols=[
-                "season",
-                "team",
-                "position",
-                "status",
-                "week",
-                "player_id",
-                "espn_id",
-                "yahoo_id",
-                "player_name",
-            ],
+            usecols=list(rosters_mapper.keys()),
             dtype={
-                "espn_id": pd.Int32Dtype(),
-                "yahoo_id": pd.Int32Dtype(),
+                key: val["dtype"]
+                for key, val in rosters_mapper.items()
             },
         ).rename(
             columns={
-                "team": "team_id",
-                "player_id": "gsis_id_id",
-                "headshot_url": "headshot",
+                key: val["name"]
+                for key, val in rosters_mapper.items()
+                if val.get("name") is not None
             }
         )
         df["team_id"].replace({"LA": "LAR"}, inplace=True)
