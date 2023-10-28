@@ -1,6 +1,6 @@
 appdirs==1.4.4
 asgiref==3.7.2
-backports.zoneinfo==0.2.1
+backports.zoneinfo==0.2.1;python_version<"3.9"
 black==23.9.1
 click==8.1.7
 colorama==0.4.6
