@@ -8,21 +8,15 @@ class PlayerStats(models.Model):
         db_table = "PlayerStats"
 
     gsis_id = ForeignKey(
-        "players.PlayerIdentifier",
-        on_delete=RESTRICT,
-        related_name="player_stats"
+        "players.PlayerIdentifier", on_delete=RESTRICT, related_name="player_stats"
     )
     season = IntegerField(null=False, blank=False)
     week = IntegerField(null=False, blank=False)
     team = ForeignKey(
-        "teams.Teams",
-        on_delete=RESTRICT,
-        related_name="player_stats_team"
+        "teams.Teams", on_delete=RESTRICT, related_name="player_stats_team"
     )
     opponent_team = ForeignKey(
-        "teams.Teams",
-        on_delete=RESTRICT,
-        related_name="player_stats_opponent"
+        "teams.Teams", on_delete=RESTRICT, related_name="player_stats_opponent"
     )
     completions = IntegerField(null=False, blank=False)
     attempts = IntegerField(null=False, blank=False)
@@ -57,4 +51,52 @@ class PlayerStats(models.Model):
     special_teams_tds = IntegerField(null=False, blank=False)
 
     def __str__(self) -> str:
-        return f"{self.gsis_id.player_name}, {self.season}, Week {self.week}, {self.team}"
+        return (
+            f"{self.gsis_id.player_name}, {self.season}, Week {self.week}, {self.team}"
+        )
+
+
+class TeamStats(models.Model):
+    class Meta:
+        verbose_name_plural = "Team Stats"
+        db_table = "TeamStats"
+
+    season = IntegerField(null=False, blank=False)
+    week = IntegerField(null=False, blank=False)
+    team = ForeignKey("teams.Teams", on_delete=RESTRICT, related_name="team_stats_team")
+    opponent_team = ForeignKey(
+        "teams.Teams", on_delete=RESTRICT, related_name="team_stats_opponent"
+    )
+    completions = IntegerField(null=False, blank=False)
+    attempts = IntegerField(null=False, blank=False)
+    passing_yards = IntegerField(null=False, blank=False)
+    passing_tds = IntegerField(null=False, blank=False)
+    interceptions = IntegerField(null=False, blank=False)
+    sacks = IntegerField(null=False, blank=False)
+    sack_yards = IntegerField(null=False, blank=False)
+    sack_fumbles = IntegerField(null=False, blank=False)
+    sack_fumbles_lost = IntegerField(null=False, blank=False)
+    passing_air_yards = IntegerField(null=False, blank=False)
+    passing_yards_after_catch = IntegerField(null=False, blank=False)
+    passing_first_downs = IntegerField(null=False, blank=False)
+    passing_2pt_conversions = IntegerField(null=False, blank=False)
+    carries = IntegerField(null=False, blank=False)
+    rushing_yards = IntegerField(null=False, blank=False)
+    rushing_tds = IntegerField(null=False, blank=False)
+    rushing_fumbles = IntegerField(null=False, blank=False)
+    rushing_fumbles_lost = IntegerField(null=False, blank=False)
+    rushing_2pt_conversions = IntegerField(null=False, blank=False)
+    rushing_first_downs = IntegerField(null=False, blank=False)
+    receptions = IntegerField(null=True, blank=False)
+    targets = IntegerField(null=True, blank=False)
+    receiving_yards = IntegerField(null=False, blank=False)
+    receiving_tds = IntegerField(null=False, blank=False)
+    receiving_fumbles = IntegerField(null=False, blank=False)
+    receiving_fumbles_lost = IntegerField(null=False, blank=False)
+    receiving_yards_after_catch = IntegerField(null=False, blank=False)
+    receiving_first_downs = IntegerField(null=False, blank=False)
+    receiving_2pt_conversions = IntegerField(null=False, blank=False)
+    special_teams_tds = IntegerField(null=False, blank=False)
+
+    def __str__(self) -> str:
+        return f"{self.team}, Opponent {self.opponent_team}, {self.season}, Week {self.week}"
