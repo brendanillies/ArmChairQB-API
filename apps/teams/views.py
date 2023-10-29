@@ -33,15 +33,13 @@ class TeamAbstractInfoRetrieve(generics.RetrieveAPIView):
     lookup_field = "team"
 
     def get_serializer_context(self):
-        if "format" in self.kwargs:
-            del self.kwargs["format"]
+        context = super().get_serializer_context()
 
         query_params = {}
         for param, value in self.request.query_params.items():
             query_params[param] = value
 
-        context = {"query_params": query_params}
-
+        context["query_params"] = query_params
         return context
 
 
