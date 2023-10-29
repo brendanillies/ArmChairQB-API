@@ -14,18 +14,24 @@ class PlayerStatsList(generics.ListAPIView):
     queryset = PlayerStats.objects.all()
     serializer_class = PlayerStatsSerializer
 
-    def get_serializer_context(self):
-        if "format" in self.kwargs:
-            del self.kwargs["format"]
-        context = {"request": self.kwargs}
-        return context
 
-
-class PlayerStatsDetail(MultipleFieldLookupMixin, generics.RetrieveAPIView):
+class PlayerStatsDetail(generics.ListAPIView):
     """
-    List all statistical field instances for a Player Identifier Instance with season and week filters
+    Lists all statistical field instances for a player
     """
 
-    queryset = PlayerStats.objects.all()
     serializer_class = PlayerStatsSerializer
-    lookup_fields = ("gsis_id", "season", "week")
+    lookup_field = "gsis_id"
+
+    def get_queryset(self):
+        return PlayerStats.objects.filter(gsis_id=self.kwargs.get("gsis_id"))
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+
+        query_params = {}
+        for param, value in self.request.query_params.items():
+            query_params[param] = value
+
+        context["query_params"] = query_params
+        return context
