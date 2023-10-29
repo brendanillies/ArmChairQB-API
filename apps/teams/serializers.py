@@ -12,13 +12,13 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TeamDepthChartSerializer(CustomHyperlinkedModelSerializer):
+class TeamDepthChartSerializer(CustomModelSerializer):
     depth_chart = DepthChartSerializer(many=True, read_only=True, source="team_depth")
     team = serializers.HyperlinkedIdentityField(view_name="team-detail", lookup_field="team")
 
     class Meta:
         model = Teams
-        fields = ["__all__"]
+        fields = "__all__"
         extra_fields = ["depth_chart"]
 
 
