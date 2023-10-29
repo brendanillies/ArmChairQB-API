@@ -51,7 +51,7 @@ class GamesAdmin(admin.ModelAdmin):
         ).rename(
             columns={
                 key: val["name"]
-                for key, val in play_by_play_mapper.items()
+                for key, val in schedule_mapper.items()
                 if val.get("name") is not None
             }
         )
@@ -82,7 +82,7 @@ class GamesAdmin(admin.ModelAdmin):
             }
         )
         df["drive_time_of_possession"].fillna(datetime.min, inplace=True)
-        df["season"] = df["game_id"].str.slice(stop=4).astype(int)
+        df["season"] = df["game_id_id"].str.slice(stop=4).astype(int)
 
         mask = df["play_type"].isin(["field_goal", "extra_point"])
         df.loc[~mask, "field_goal_kick_distance"] = 0
