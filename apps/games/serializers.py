@@ -10,3 +10,4 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Schedule
         list_serializer_class = FilteredListSerializer
         fields = "__all__"
+        ordering = ["season", "week"]
