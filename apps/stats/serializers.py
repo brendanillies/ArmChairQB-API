@@ -17,4 +17,3 @@ class PlayerStatsSerializer(CustomModelSerializer):
         model = PlayerStats
         list_serializer_class = FilteredListSerializer
         fields = "__all__"
-        extra_fields = ["team", "opponent_team"]
