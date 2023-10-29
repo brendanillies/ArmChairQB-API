@@ -13,6 +13,9 @@ class PlayerIdentifierSerializer(serializers.ModelSerializer):
 
 class DepthChartSerializer(CustomModelSerializer):
     player = PlayerIdentifierSerializer(read_only=True, source="gsis_id")
+    team = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="team-detail", lookup_field="team"
+    )
 
     class Meta:
         model = DepthChart
@@ -23,6 +26,9 @@ class DepthChartSerializer(CustomModelSerializer):
 
 class RosterSerializer(CustomModelSerializer):
     player = PlayerIdentifierSerializer(read_only=True, source="gsis_id")
+    team = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="team-detail", lookup_field="team"
+    )
 
     class Meta:
         model = Roster
