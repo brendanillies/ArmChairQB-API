@@ -1,4 +1,5 @@
 from players.serializers import RosterSerializer, DepthChartSerializer
+from games.serializers import ScheduleSerializer
 from rest_framework import serializers
 
 from .models import Teams
@@ -24,3 +25,12 @@ class TeamRosterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teams
         fields = ["team", "roster"]
+
+
+class TeamScheduleSerializer(serializers.ModelSerializer):
+    away_games = ScheduleSerializer(many=True, read_only=True, source="schedule_away")
+    home_games = ScheduleSerializer(many=True, read_only=True, source="schedule_home")
+
+    class Meta:
+        model = Teams
+        fields = ["team", "away_games", "home_games"]

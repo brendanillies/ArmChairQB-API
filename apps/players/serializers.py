@@ -24,7 +24,7 @@ class DepthChartSerializer(serializers.ModelSerializer):
             "formation",
             "position",
             "depth_position",
-            "player"
+            "player",
         ]
 
 

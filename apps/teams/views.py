@@ -1,8 +1,12 @@
-from rest_framework import generics, filters
-from filters.mixins import FiltersMixin
+from rest_framework import generics
 
 from .models import Teams
-from .serializers import TeamDepthChartSerializer, TeamRosterSerializer, TeamSerializer
+from .serializers import (
+    TeamDepthChartSerializer,
+    TeamRosterSerializer,
+    TeamSerializer,
+    TeamScheduleSerializer,
+)
 
 
 class TeamList(generics.ListAPIView):
@@ -43,8 +47,7 @@ class TeamAbstractInfoRetrieve(generics.RetrieveAPIView):
 
 class TeamRoster(TeamAbstractInfoRetrieve):
     """
-    This view returns a list of all Rostered players on a team
-    filtered by week
+    Returns all rostered players for a team
     """
 
     serializer_class = TeamRosterSerializer
@@ -52,10 +55,18 @@ class TeamRoster(TeamAbstractInfoRetrieve):
 
 class TeamDepthChart(TeamAbstractInfoRetrieve):
     """
-    This view returns a team's Depth Chart filtered by week
+    Returns a team's depth chart
     """
 
     serializer_class = TeamDepthChartSerializer
+
+
+class TeamSchedule(TeamAbstractInfoRetrieve):
+    """
+    Returns a team's schedule
+    """
+
+    serializer_class = TeamScheduleSerializer
 
 
 # @api_view(["GET", "POST"])

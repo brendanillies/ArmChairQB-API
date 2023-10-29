@@ -14,6 +14,10 @@ urlpatterns = [
         "api/teams/<str:team>/depth/",
         views.TeamDepthChart.as_view()
     ),
+    path(
+        "api/teams/<str:team>/schedule/",
+        views.TeamSchedule.as_view()
+    )
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
