@@ -5,7 +5,7 @@ from stats import views
 
 urlpatterns = [
     path(
-        "api/playerStats/<str:gsis_id>/",
+        "api/stats/<str:gsis_id>/",
         views.PlayerStatsDetail.as_view(),
     ),
     # path(
