@@ -11,16 +11,16 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class TeamDepthChartSerializer(serializers.ModelSerializer):
-    team_depth = DepthChartSerializer(many=True, read_only=True)
+    depth_chart = DepthChartSerializer(many=True, read_only=True, source="team_depth")
 
     class Meta:
         model = Teams
-        fields = ["team", "team_depth"]
+        fields = ["team", "depth_chart"]
 
 
 class TeamRosterSerializer(serializers.ModelSerializer):
-    team_roster = RosterSerializer(many=True, read_only=True)
+    roster = RosterSerializer(many=True, read_only=True, source="team_roster")
 
     class Meta:
         model = Teams
-        fields = ["team", "team_roster"]
+        fields = ["team", "roster"]

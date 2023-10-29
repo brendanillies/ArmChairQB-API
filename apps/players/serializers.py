@@ -8,18 +8,30 @@ from .models import DepthChart, PlayerIdentifier, Roster
 class PlayerIdentifierSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerIdentifier
-        fields = "__all__"
+        fields = ["gsis_id", "espn_id", "yahoo_id", "headshot", "age", "player_name"]
 
 
 class DepthChartSerializer(serializers.ModelSerializer):
+    player = PlayerIdentifierSerializer(read_only=True, source="gsis_id")
+
     class Meta:
         model = DepthChart
         list_serializer_class = FilteredListSerializer
-        fields = "__all__"
+        fields = [
+            "season",
+            "week",
+            "depth",
+            "formation",
+            "position",
+            "depth_position",
+            "player"
+        ]
 
 
 class RosterSerializer(serializers.ModelSerializer):
+    player = PlayerIdentifierSerializer(read_only=True, source="gsis_id")
+
     class Meta:
         model = Roster
         list_serializer_class = FilteredListSerializer
-        fields = ["week", "player_name", "gsis_id", "position", "status"]
+        fields = ["season", "week", "player"]
