@@ -17,20 +17,17 @@ class _PlayerStatSerializer(CustomModelSerializer):
 
     class Meta:
         model = PlayerStats
-        fields = "__all__"
+        exclude = ["gsis_id"]
 
 
 class _TeamStatSerializer(CustomModelSerializer):
-    team = serializers.HyperlinkedRelatedField(
-        read_only=True, view_name="team-detail", lookup_field="team"
-    )
     opponent_team = serializers.HyperlinkedRelatedField(
         read_only=True, view_name="team-detail", lookup_field="team"
     )
 
     class Meta:
         model = TeamStats
-        fields = "__all__"
+        exclude = ["team"]
 
 
 class PlayerStatSerializer(CustomModelSerializer):
