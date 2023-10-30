@@ -17,6 +17,7 @@ class _PlayerStatSerializer(CustomModelSerializer):
 
     class Meta:
         model = PlayerStats
+        list_serializer_class = FilteredListSerializer
         exclude = ["gsis_id"]
 
 
@@ -27,6 +28,7 @@ class _TeamStatSerializer(CustomModelSerializer):
 
     class Meta:
         model = TeamStats
+        list_serializer_class = FilteredListSerializer
         exclude = ["team"]
 
 
