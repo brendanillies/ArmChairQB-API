@@ -6,9 +6,14 @@ from stats import views
 urlpatterns = [
     path(
         "api/stats/player/<str:gsis_id>/",
-        views.PlayerStatsDetail.as_view(),
+        views.PlayerStatDetail.as_view(),
         name="player-stats"
     ),
+    path(
+        "api/stats/team/<str:team>/",
+        views.TeamStatDetail.as_view(),
+        name="team-stats"
+    )
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
