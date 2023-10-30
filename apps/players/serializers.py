@@ -20,7 +20,7 @@ class DepthChartSerializer(CustomModelSerializer):
     class Meta:
         model = DepthChart
         list_serializer_class = FilteredListSerializer
-        fields = "__all__"
+        exclude = ["gsis_id"]
         extra_fields = ["player"]
 
 
@@ -33,5 +33,5 @@ class RosterSerializer(CustomModelSerializer):
     class Meta:
         model = Roster
         list_serializer_class = FilteredListSerializer
-        fields = "__all__"
+        exclude = ["gsis_id"]
         extra_fields = ["player"]
