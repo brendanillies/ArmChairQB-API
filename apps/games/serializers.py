@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from apps.serializers import FilteredListSerializer
-
 from .models import Schedule, Stadium
 
 
@@ -17,3 +15,9 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Schedule
         fields = "__all__"
         ordering = ["season", "week"]
+
+
+class StadiumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stadium
+        fields = "__all__"
