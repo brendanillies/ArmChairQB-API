@@ -1,7 +1,7 @@
 from rest_framework import generics
 
-from .models import Schedule, Stadium
-from .serializers import ScheduleSerializer, StadiumSerializer
+from .models import Schedule, Stadium, PlayByPlay
+from .serializers import ScheduleSerializer, StadiumSerializer, PlayByPlaySerializer
 
 
 class ScheduleList(generics.ListAPIView):
@@ -15,7 +15,7 @@ class ScheduleList(generics.ListAPIView):
 
 class ScheduleDetail(generics.RetrieveAPIView):
     """
-    List all game instances
+    Retrieve specific game instance
     """
 
     queryset = Schedule.objects.all()
@@ -30,3 +30,11 @@ class StadiumList(generics.ListAPIView):
 
     queryset = Stadium.objects.all()
     serializer_class = StadiumSerializer
+
+
+class PlayByPlayList(generics.ListAPIView):
+    """
+    List all plays
+    """
+    queryset = PlayByPlay.objects.all()
+    serializer_class = PlayByPlaySerializer

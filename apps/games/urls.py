@@ -11,6 +11,7 @@ urlpatterns = [
         name="schedule-detail",
     ),
     path("api/stadium/", views.StadiumList.as_view(), name="stadium-list"),
+    path("api/plays/", views.PlayByPlayList.as_view(), name="play-list")
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
