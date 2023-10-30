@@ -13,6 +13,16 @@ class ScheduleList(generics.ListAPIView):
     serializer_class = ScheduleSerializer
 
 
+class ScheduleDetail(generics.RetrieveAPIView):
+    """
+    List all game instances
+    """
+
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+    lookup_field = "game_id"
+
+
 class StadiumList(generics.ListAPIView):
     """
     List all stadium instances

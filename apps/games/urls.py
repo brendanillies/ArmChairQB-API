@@ -5,6 +5,11 @@ from games import views
 
 urlpatterns = [
     path("api/schedule/", views.ScheduleList.as_view(), name="schedule-list"),
+    path(
+        "api/schedule/<str:game_id>/",
+        views.ScheduleDetail.as_view(),
+        name="schedule-detail",
+    ),
     path("api/stadium/", views.StadiumList.as_view(), name="stadium-list"),
 ]
 
