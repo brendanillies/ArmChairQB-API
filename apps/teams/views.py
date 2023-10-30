@@ -24,6 +24,16 @@ class TeamList(generics.ListAPIView):
         return Teams.objects.all()
 
 
+class TeamDetail(generics.RetrieveAPIView):
+    """
+    List all Teams, or create a new Team
+    """
+
+    queryset = Teams.objects.all()
+    serializer_class = TeamSerializer
+    lookup_field = "team"
+
+
 class TeamAbstractInfoRetrieve(generics.RetrieveAPIView):
     """
     Abstract ListView of Team Roster or DepthChart objects
