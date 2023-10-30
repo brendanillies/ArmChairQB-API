@@ -4,13 +4,10 @@ from .models import Schedule, Stadium
 from .serializers import ScheduleSerializer
 
 
-class ScheduleAbstractInfoList(generics.ListAPIView):
-    queryset = Schedule.objects.all()
-
-
-class ScheduleList(ScheduleAbstractInfoList):
+class ScheduleList(generics.ListAPIView):
     """
     List all game instances
     """
 
+    queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
