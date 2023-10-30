@@ -15,6 +15,5 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        list_serializer_class = FilteredListSerializer
         fields = "__all__"
         ordering = ["season", "week"]
