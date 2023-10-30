@@ -6,9 +6,13 @@ from .models import DepthChart, PlayerIdentifier, Roster
 
 
 class PlayerIdentifierSerializer(serializers.ModelSerializer):
+    gsis_id = serializers.HyperlinkedIdentityField(
+        view_name="player-detail", lookup_field="gsis_id"
+    )
+
     class Meta:
         model = PlayerIdentifier
-        fields = ["gsis_id", "espn_id", "yahoo_id", "headshot", "age", "player_name"]
+        fields = "__all__"
 
 
 class DepthChartSerializer(CustomModelSerializer):
