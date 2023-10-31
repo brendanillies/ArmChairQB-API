@@ -3,7 +3,12 @@ from rest_framework import serializers
 
 class FilteredListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
-        data = data.filter(**self.context["query_params"])
+        data = data.filter(
+            **{
+                param: value
+                for param, value in self.context["request"].query_params.items()
+            }
+        )
         return super().to_representation(data)
 
 
