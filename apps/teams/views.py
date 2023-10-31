@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework import filters
 
 from .models import Teams
 from .serializers import (
@@ -14,14 +15,11 @@ class TeamList(generics.ListAPIView):
     List all Teams, or create a new Team
     """
 
+    queryset = Teams.objects.all()
     serializer_class = TeamSerializer
     lookup_field = "team"
-
-    def get_queryset(self):
-        team = self.kwargs.get("team", None)
-        if team is not None:
-            return Teams.objects.filter(team__icontains=team)
-        return Teams.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["team", "team_name", "team_nick", "team_division"]
 
 
 class TeamDetail(generics.RetrieveAPIView):
