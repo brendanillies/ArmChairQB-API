@@ -42,16 +42,6 @@ class TeamAbstractInfoRetrieve(generics.RetrieveAPIView):
     queryset = Teams.objects.all()
     lookup_field = "team"
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-
-        query_params = {}
-        for param, value in self.request.query_params.items():
-            query_params[param] = value
-
-        context["query_params"] = query_params
-        return context
-
 
 class TeamRoster(TeamAbstractInfoRetrieve):
     """
