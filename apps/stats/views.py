@@ -19,7 +19,7 @@ class PlayerStatDetail(generics.RetrieveAPIView):
 
 class TeamStatDetail(generics.RetrieveAPIView):
     """
-    Lists all statistical field instances for a player
+    Lists all statistical field instances for a team
     """
 
     queryset = Teams.objects.all()
