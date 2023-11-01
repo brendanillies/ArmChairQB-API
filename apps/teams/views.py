@@ -2,10 +2,7 @@ from rest_framework import generics
 from rest_framework import filters
 
 from .models import Teams
-from .serializers import (
-    TeamSerializer,
-    TeamScheduleSerializer
-)
+from .serializers import TeamSerializer, TeamScheduleSerializer
 
 
 class TeamList(generics.ListAPIView):
@@ -28,9 +25,12 @@ class TeamDetail(generics.RetrieveAPIView):
     serializer_class = TeamSerializer
     lookup_field = "team"
 
-# class TeamSchedule(TeamAbstractInfoRetrieve):
-#     """
-#     Returns a team's schedule
-#     """
 
-#     serializer_class = TeamScheduleSerializer
+class TeamSchedule(generics.RetrieveAPIView):
+    """
+    Returns a team's schedule
+    """
+
+    queryset = Teams.objects.all()
+    serializer_class = TeamScheduleSerializer
+    lookup_field = "team"
