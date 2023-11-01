@@ -5,12 +5,12 @@ from players import views
 
 urlpatterns = [
     path(
-        "api/playerIdentifiers/",
+        "api/players/",
         views.PlayerIdentifierList.as_view(),
         name="player-list"
     ),
     path(
-        "api/playerIdentifiers/<str:gsis_id>/",
+        "api/players/<str:gsis_id>/",
         views.PlayerIdentifierDetail.as_view(),
         name="player-detail"
     ),
