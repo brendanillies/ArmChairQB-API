@@ -14,6 +14,8 @@ urlpatterns = [
         views.PlayerIdentifierDetail.as_view(),
         name="player-detail"
     ),
+    path("api/roster/", views.RosterList.as_view(), name="roster-list"),
+    path("api/depthChart/", views.DepthChartList.as_view(), name="depth-list"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

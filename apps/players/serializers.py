@@ -19,7 +19,6 @@ class DepthChartSerializer(CustomModelSerializer):
 
     class Meta:
         model = DepthChart
-        list_serializer_class = FilteredListSerializer
         fields = "__all__"
         extra_fields = ["player"]
 
@@ -32,6 +31,5 @@ class RosterSerializer(CustomModelSerializer):
 
     class Meta:
         model = Roster
-        list_serializer_class = FilteredListSerializer
         fields = "__all__"
         extra_fields = ["player"]
