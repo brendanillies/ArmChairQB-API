@@ -9,8 +9,8 @@ urlpatterns = [
     path(
         "api/teams/<str:team>/schedule/",
         views.TeamSchedule.as_view(),
-        name="team-schedule"
-    )
+        name="team-schedule",
+    ),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
